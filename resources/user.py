@@ -29,6 +29,12 @@ class UserRegisterResource(Resource):
                 'result' : 'fail',
                 'error' : str(e)
             }, 400
+            
+        if len(data['password']) < 6:
+            return {
+                'result' : 'fail',
+                'error' : '비밀번호는 최소 6자리 이상입니다.'
+            }, 500
         
         # 비밀번호 암호화
         hash_password = create_hash_passwrod(data['password'])

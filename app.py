@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from config import Config
 
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource
+from resources.meeting import MeetingCreateResource, MeetingGetAllResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,6 +20,9 @@ api = Api(app)
 api.add_resource(UserRegisterResource, '/user/register')
 api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
+
+api.add_resource(MeetingCreateResource, '/meeting')
+api.add_resource(MeetingGetAllResource, '/meeting/list')
 
 
 
