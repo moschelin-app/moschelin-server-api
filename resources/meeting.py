@@ -102,7 +102,7 @@ class MeetingResource(Resource):
             connection = get_connection()
             
             query = '''
-                select m.*, u.id as uid, u.nickname, u.profile, s.id as storeId, s.name as storeName, 
+                select m.*, u.nickname, u.profile, s.id as storeId, s.name as storeName, 
                     s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend
                 from meeting m
                     join user u
