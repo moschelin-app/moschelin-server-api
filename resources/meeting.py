@@ -132,7 +132,7 @@ class MeetingResource(Resource):
             result['profiles'] = cursor.fetchall()
             
             # 날짜 포멧
-            #result['date'] = result['date'].isoformat()
+            result['date'] = result['date'].isoformat()
             result['createdAt'] = result['createdAt'].isoformat()
             result['updatedAt'] = result['updatedAt'].isoformat()
             # 소수점 포멧
@@ -304,6 +304,7 @@ class MeetingResource(Resource):
 
 # 모임 참가/취소
 class MeetingAttendResource(Resource):
+    # 모임 참가에 자신의 모임인지 확인해야함
     
     # 모임 참가
     @jwt_required()
