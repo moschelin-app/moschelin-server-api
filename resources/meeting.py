@@ -71,7 +71,7 @@ class MeetingCreateResource(Resource):
                 values
                 (%s, %s, %s ,%s, %s, %s);
             '''
-            record = (userId, result['id'], data['content'], data['date'], data['maximum'], request.files['photo'])
+            record = (userId, result['id'], data['content'], data['date'], data['maximum'], None if 'photo' not in request.files else request.files['photo'])
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -234,7 +234,7 @@ class MeetingResource(Resource):
                 set storeId = %s, content = %s, date = %s, maximum = %s, photo = %s
                 where userId = %s and id = %s;
             '''
-            record = (result['id'], data['content'], data['date'], data['maximum'], request.files['photo'], userId, meetingId)
+            record = (result['id'], data['content'], data['date'], data['maximum'], None if 'photo' not in request.files else request.files['photo'], userId, meetingId)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
