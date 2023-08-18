@@ -95,7 +95,7 @@ class MeetingCreateResource(Resource):
 # 모임 URL
 class MeetingResource(Resource):
     # 특정 모임 상세보기
-    @jwt_required()
+    @jwt_required(optional=True)
     def get(self, meetingId):
         
         try:
@@ -426,7 +426,7 @@ class MeetingAttendResource(Resource):
 
 # 위치 주위의 모임 리스트 가져오기
 class MeetingGetAllResource(Resource):
-    @jwt_required()
+    @jwt_required(optional=True)
     def get(self):
         
         data = request.args
