@@ -86,9 +86,9 @@ class ReviewAddResource(Resource):
         
                 s3 = boto3.client(
                     's3',
-                    aws_access_key_id = Config.AWS_ACCESS_KEY,
+                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
                     aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY, 
-                    region_name = Config.AWS_S3_REGION_NAME
+                    # region_name = Config.AWS_S3_REGION_NAME
                 )
                 s3.upload_fileobj(
                     request.files['photo'],
@@ -104,7 +104,7 @@ class ReviewAddResource(Resource):
                         (reviewId, photoURL)
                         values
                         (%s, %s);'''
-                record = (reviewId, Config.S3_BASE_URL+new_filename)
+                record = (reviewId, Config.S3_Base_URL+new_filename)
                 cursor = connection.cursor()
                 cursor.execute(query, record)
             
