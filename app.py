@@ -7,6 +7,9 @@ from config import Config
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
 from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchDetailResource, SearchRelationResource
+from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailsResource, ReviewListResource,ReviewModifyResource
+from resources.comment import ReviewCommentModResource, ReviewCommentResource
+from resources.like import ReviewLikeResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -21,6 +24,18 @@ api = Api(app)
 api.add_resource(UserRegisterResource, '/user/register')
 api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
+
+# 리뷰 작성
+api.add_resource( ReviewAddResource , '/review/add')
+# 특정 리뷰 관련
+api.add_resource( ReviewModifyResource , '/review/<int:reviewId>')
+
+# 댓글 작성
+api.add_resource( ReviewCommentResource , '/review/<int:reviewId>/comment')
+# 특정 댓글 관련
+api.add_resource( ReviewCommentModResource , '/review/comment/<commentId>')
+# 리뷰 좋아요
+api.add_resource( ReviewLikeResource , '/review/<int:reviewId>/like')
 
 # 모임 생성
 api.add_resource(MeetingCreateResource, '/meeting')
