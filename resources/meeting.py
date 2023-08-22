@@ -6,6 +6,11 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql_connection import get_connection
 from mysql.connector import Error
 
+from config import Config
+from utils import create_file_name
+
+import boto3
+
 # 모임 생성
 class MeetingCreateResource(Resource):
     @jwt_required()
@@ -31,8 +36,30 @@ class MeetingCreateResource(Resource):
                 }, 400
 
         userId = get_jwt_identity()
+        file_name = ''
                 
         try:
+            if 'photo' in request.files:
+                file_name = create_file_name()
+                
+                s3 = boto3.client(
+                    's3',
+                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY
+                )
+                
+                # 파일 업로드
+                s3.upload_fileobj(
+                    request.files['photo'],
+                    Config.S3_BUCKET,
+                    file_name,
+                    ExtraArgs = {
+                        'ACL' : 'public-read', # 모든 사람들이 사진을 볼수 있어야함. 권한 설정
+                        'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
+                    }
+                )
+            
+            
             connection = get_connection()
             
             # 가게 정보 찾아봄. 
@@ -71,7 +98,7 @@ class MeetingCreateResource(Resource):
                 values
                 (%s, %s, %s ,%s, %s, %s);
             '''
-            record = (userId, result['id'], data['content'], data['date'], data['maximum'], None if 'photo' not in request.files else request.files['photo'])
+            record = (userId, result['id'], data['content'], data['date'], data['maximum'], None if file_name == '' else Config.S3_Base_URL + file_name)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -85,6 +112,11 @@ class MeetingCreateResource(Resource):
                 'result' : 'fail',
                 'error' : str(e)
             }, 500   
+        except Exception as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
         
         
         return {
@@ -177,8 +209,29 @@ class MeetingResource(Resource):
                 }, 400
 
         userId = get_jwt_identity()
+        file_name = ''
         
         try:
+            if 'photo' in request.files:
+                file_name = create_file_name()
+                
+                s3 = boto3.client(
+                    's3',
+                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY
+                )
+                
+                # 파일 업로드
+                s3.upload_fileobj(
+                    request.files['photo'],
+                    Config.S3_BUCKET,
+                    file_name,
+                    ExtraArgs = {
+                        'ACL' : 'public-read', # 모든 사람들이 사진을 볼수 있어야함. 권한 설정
+                        'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
+                    }
+                )
+            
             connection = get_connection()
             
             # 등록된 모임이 있는지 확인
@@ -234,7 +287,7 @@ class MeetingResource(Resource):
                 set storeId = %s, content = %s, date = %s, maximum = %s, photo = %s
                 where userId = %s and id = %s;
             '''
-            record = (result['id'], data['content'], data['date'], data['maximum'], None if 'photo' not in request.files else request.files['photo'], userId, meetingId)
+            record = (result['id'], data['content'], data['date'], data['maximum'], None if file_name == '' else Config.S3_Base_URL + file_name, userId, meetingId)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -248,6 +301,11 @@ class MeetingResource(Resource):
                 'result' : 'fail',
                 'error' : str(e)
             }, 500  
+        except Exception as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
         
         
         return {

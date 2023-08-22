@@ -1,4 +1,5 @@
 from passlib.hash import pbkdf2_sha256
+from datetime import datetime
 from config import Config
 
 def create_hash_passwrod(new_password):
@@ -8,3 +9,6 @@ def create_hash_passwrod(new_password):
 def compare_hash_password(new_password, old_password):
     compare_password = pbkdf2_sha256.verify(new_password + Config.SALT, old_password)
     return compare_password
+
+def create_file_name():
+    return datetime.now().isoformat().replace(':','_').replace('.', '_') + '.jpg'
