@@ -6,6 +6,7 @@ from config import Config
 
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
+from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchDetailResource, SearchRelationResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -29,6 +30,17 @@ api.add_resource(MeetingGetAllResource, '/meeting/list')
 api.add_resource( MeetingResource , '/meeting/<int:meetingId>')
 # 모임 참가/취소
 api.add_resource( MeetingAttendResource , '/meeting/<int:meetingId>/attend')
+
+# 검색 기능
+api.add_resource(SearchResource, '/search')
+# 검색 상세보기
+api.add_resource(SearchDetailResource, '/search/detail')
+# 최근 검색
+api.add_resource(SearchResentResource, '/search/recent')
+# 최근 검색 삭제
+api.add_resource(SearchResentDeleteResource, '/search/recent/delete/<int:searchId>')
+# 연관 검색
+api.add_resource(SearchRelationResource, '/search/relation')
 
 
 
