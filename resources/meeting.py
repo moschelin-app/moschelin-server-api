@@ -94,7 +94,7 @@ class MeetingCreateResource(Resource):
             # 모임 등록
             query = '''
                 insert into meeting
-                (userId, storeId, content, date, maximum, photo)
+                (userId, storeId, content, date, maximum, photoURL)
                 values
                 (%s, %s, %s ,%s, %s, %s);
             '''
@@ -134,7 +134,8 @@ class MeetingResource(Resource):
             connection = get_connection()
             
             query = '''
-                select m.*, u.nickname, u.profile, s.id as storeId, s.name as storeName, 
+                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.createdAt, m.updatedAt, 
+                    u.nickname, u.profileURL as profile, s.id as storeId, s.name as storeName, 
                     s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend
                 from meeting m
                     join user u
@@ -153,11 +154,11 @@ class MeetingResource(Resource):
             result = cursor.fetchone()
             
             query = '''
-                select u.profile
+                select u.profileURL as profile
                 from meeting_attend ma
                     join user u
                     on ma.userId = u.id
-                where ma.meetingId = %s;
+                where ma.meetingId = %s;    
             '''
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -284,7 +285,7 @@ class MeetingResource(Resource):
             # 모임 수정
             query = '''
                 update meeting
-                set storeId = %s, content = %s, date = %s, maximum = %s, photo = %s
+                set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s
                 where userId = %s and id = %s;
             '''
             record = (result['id'], data['content'], data['date'], data['maximum'], None if file_name == '' else Config.S3_Base_URL + file_name, userId, meetingId)
@@ -512,7 +513,8 @@ class MeetingGetAllResource(Resource):
             
             # 설정한 거리안의 정보들을 불러옴
             query = f'''
-                select m.*, s.name as 'storeName', s.lat as 'storeLat', s.lng as 'storeLng',truncate(s.distance, 2) as distance, count(ma.userId) attend
+                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.createdAt, m.updatedAt
+                , s.name as 'storeName', s.lat as 'storeLat', s.lng as 'storeLng',truncate(s.distance, 2) as distance, count(ma.userId) attend
                 from (select id, name,lat, lng, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
                     -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
@@ -535,7 +537,7 @@ class MeetingGetAllResource(Resource):
             i = 0
             for result in result_list:
                 query = f'''
-                    select u.profile
+                    select u.profileURL as profile
                     from meeting_attend ma
                         join user u 
                         on u.id = ma.userId and ma.meetingId = {result['id']};
