@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql.connector import Error
 from mysql_connection import get_connection
 
-from datetime import datetime
+from utils import create_file_name
 from config import Config
 import boto3
 
@@ -19,6 +19,7 @@ class ReviewAddResource(Resource):
         userId = get_jwt_identity()
 
         data = request.form
+        
         
 
             # body  = [form-data]{
@@ -67,10 +68,10 @@ class ReviewAddResource(Resource):
             # 리뷰 API    
             # 리뷰 글 작성 코드
             query = '''insert into review
-                    (userId, storeId, content)
+                    (userId, storeId, content, rating)
                     values
-                    (%s, %s, %s);'''
-            record = (userId, result_list[0]['id'], data['content'])
+                    (%s, %s, %s, %s);'''
+            record = (userId, result_list[0]['id'], data['content'], data['rating'])
             cursor = connection.cursor()
             cursor.execute(query,record) 
             
@@ -79,113 +80,72 @@ class ReviewAddResource(Resource):
             # 사진 API
             # 리뷰 사진 넣기
             if 'photo' in request.files:
-                # 이미지 파일 업로드를 위한 코드
-                current_time = datetime.now()
-                print(current_time.isoformat().replace(':', '_').replace('.', '_') + '.jpg')
-                new_filename = current_time.isoformat().replace(':', '_').replace('.', '_') + '.jpg'
-        
-                s3 = boto3.client(
-                    's3',
-                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY, 
-                    # region_name = Config.AWS_S3_REGION_NAME
-                )
-                s3.upload_fileobj(
-                    request.files['photo'],
-                    Config.S3_BUCKET,
-                    new_filename,
-                    ExtraArgs = {
-                        'ACL' : 'public-read',
-                        'ContentType' : 'image/jpeg'
-                    }
-                )
-                
-                query = '''insert into review_photo
-                        (reviewId, photoURL)
-                        values
-                        (%s, %s);'''
-                record = (reviewId, Config.S3_Base_URL+new_filename)
-                cursor = connection.cursor()
-                cursor.execute(query, record)
+                for photo in request.files.getlist('photo'):
+                    # 이미지 파일 업로드를 위한 코드                
+                    # print(current_time.isoformat().replace(':', '_').replace('.', '_') + '.jpg')
+                    new_filename = create_file_name()
             
-            # 태그 API
-            # 태그 중복 확인
-            query = '''select * from tag
-                    where name = %s;'''
-            record = [data['tag']]
-            cursor = connection.cursor()
-            cursor.execute(query, record)
-            result_list = cursor.fetchall()
-            # print('태그의 이름은 : ')
-            # print(result_list)
-            
-            if len(result_list) == 0:
-                # 태그 넣기
-                query = '''insert into tag
-                            (name) values (%s);'''
-                record = [data['tag']]
-                cursor = connection.cursor()
-                cursor.execute(query,record)
-                result_list.append({
-                    'id': cursor.lastrowid
-                })
-            
-                # print(result_list)
-                
-                tagId = cursor.lastrowid
-                
-                # 리뷰태그 테이블의 정보 입력
-                query = '''insert into review_tag
-                            (reviewId, tagId)
+                    s3 = boto3.client(
+                        's3',
+                        aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                        aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY, 
+                        # region_name = Config.AWS_S3_REGION_NAME
+                    )
+                    s3.upload_fileobj(
+                        photo,
+                        Config.S3_BUCKET,
+                        new_filename,
+                        ExtraArgs = {
+                            'ACL' : 'public-read',
+                            'ContentType' : 'image/jpeg'
+                        }
+                    )
+                    
+                    query = '''insert into review_photo
+                            (reviewId, photoURL)
                             values
                             (%s, %s);'''
-                record = (reviewId, tagId)
-                cursor = connection.cursor()
-                cursor.execute(query,record) 
+                    record = (reviewId, Config.S3_Base_URL+new_filename)
+                    cursor = connection.cursor()
+                    cursor.execute(query, record)
             
-            print(dict(data['rating'])['짠맛'])
-            # 별점 API
-            # 별점 중복 체크하기.
-            query = '''select * from rating
-                        where name = %s;'''
-            record = [data['rating']]
-            cursor = connection.cursor()
-            cursor.execute(query,record) 
-            result_list = cursor.fetchall()
-            print('별점 : ')
-            print(result_list)
             
-            if len(result_list) == 0:
-                # 별점 넣기
-                query = '''insert into rating
-                            (name) values (%s);'''
-                record = [data['rating']]
-                cursor = connection.cursor()
-                cursor.execute(query,record)
-                result_list.append({
-                    'id': cursor.lastrowid
-                })
-            
-                print(result_list)
+            if 'tag' in data:
+                tags = data.getlist('tag')
+                for tag in tags:
+            # 태그 API
+            # 태그 중복 확인
+                    query = '''select * from tag
+                            where name = %s;'''
+                    record = [tag]
+                    cursor = connection.cursor(dictionary=True)
+                    cursor.execute(query, record)
+                    result_list = cursor.fetchall()
+
+                    if len(result_list) == 0:
+                        # 태그 넣기
+                        query = '''insert into tag
+                                    (name) values (%s);'''
+                        record = [tag]
+                        cursor = connection.cursor()
+                        cursor.execute(query,record)
+                        result_list.append({
+                            'id': cursor.lastrowid
+                        })
                 
-            ratingId = cursor.lastrowid
-                
-            # 별점 테이블의 정보 입력
-            query = '''insert into review_rating
-                    (reviewId, ratingId, rating)
-                    values
-                    (%s, %s, %s);'''
-            record = (reviewId, ratingId, data['rating'])
-            cursor = connection.cursor()
-            cursor.execute(query,record) 
-            return
+                    # 리뷰태그 테이블의 정보 입력
+                    query = '''insert into review_tag
+                                (reviewId, tagId)
+                                values
+                                (%s, %s);'''
+                    record = (reviewId, result_list[0]['id'])
+                    cursor = connection.cursor()
+                    cursor.execute(query,record) 
             
             connection.commit()
             
             cursor.close()
-            connection.close()        
-            
-            cursor.lastrowid
+            connection.close()                    
             
         except Error as e:
             return{
