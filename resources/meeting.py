@@ -36,8 +36,16 @@ class MeetingCreateResource(Resource):
                 }, 400
 
         userId = get_jwt_identity()
-        file_name = ''
-                
+        
+        storeName = data.get('storeName')
+        storeLat = data.get('storeLat')
+        storeLng = data.get('storeLng')
+        content = data.get('content')
+        date = data.get('date')
+        maximum = data.get('maximum')
+        
+        file_name == ''
+       
         try:
             if 'photo' in request.files:
                 file_name = create_file_name()
@@ -68,7 +76,7 @@ class MeetingCreateResource(Resource):
                 from store
                 where name = %s and lat = %s and lng = %s;
             """
-            record = (data['storeName'], data['storeLat'], data['storeLng'])
+            record = (storeName, storeLat, storeLng)
             
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -82,7 +90,7 @@ class MeetingCreateResource(Resource):
                     values
                     (%s, %s, %s);
                 '''
-                record = (data['storeName'], data['storeLat'], data['storeLng'])
+                record = (storeName, storeLat, storeLng)
                 
                 cursor = connection.cursor()
                 cursor.execute(query, record)
@@ -98,7 +106,7 @@ class MeetingCreateResource(Resource):
                 values
                 (%s, %s, %s ,%s, %s, %s);
             '''
-            record = (userId, result['id'], data['content'], data['date'], data['maximum'], None if file_name == '' else Config.S3_Base_URL + file_name)
+            record = (userId, result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -210,6 +218,15 @@ class MeetingResource(Resource):
                 }, 400
 
         userId = get_jwt_identity()
+        
+        storeName = data.get('storeName')
+        storeLat = data.get('storeLat')
+        storeLng = data.get('storeLng')
+        content = data.get('content')
+        date = data.get('date')
+        maximum = data.get('maximum')
+        
+        
         file_name = ''
         
         try:
@@ -258,7 +275,7 @@ class MeetingResource(Resource):
                 from store
                 where name = %s and lat = %s and lng = %s;
             """
-            record = (data['storeName'], data['storeLat'], data['storeLng'])
+            record = (storeName, storeLat, storeLng)
             
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -272,7 +289,7 @@ class MeetingResource(Resource):
                     values
                     (%s, %s, %s);
                 '''
-                record = (data['storeName'], data['storeLat'], data['storeLng'])
+                record = (storeName, storeLat, storeLng)
                 
                 cursor = connection.cursor()
                 cursor.execute(query, record)
@@ -288,7 +305,7 @@ class MeetingResource(Resource):
                 set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s
                 where userId = %s and id = %s;
             '''
-            record = (result['id'], data['content'], data['date'], data['maximum'], None if file_name == '' else Config.S3_Base_URL + file_name, userId, meetingId)
+            record = (result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, userId, meetingId)
             
             cursor = connection.cursor()
             cursor.execute(query, record)

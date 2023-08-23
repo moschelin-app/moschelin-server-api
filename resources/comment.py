@@ -16,13 +16,15 @@ class ReviewCommentResource(Resource):
         
         data = request.get_json()
         
+        content = data.get('content')
+        
         try:
             connection = get_connection()
             query = '''insert into review_comment
                     (userId, reviewId, content)
                     values 
                     (%s, %s, %s);'''
-            record = (userId, 1, data['content'])
+            record = (userId, 1, content)
             cursor = connection.cursor()
             cursor.execute(query, record)
             
@@ -50,12 +52,14 @@ class ReviewCommentModResource(Resource):
         
         data = request.get_json()
         
+        content = data.get('content')
+        
         try:
             connection = get_connection()
             query = '''update review_comment
                     set content = %s
                     where id = %s and userId = %s;'''
-            record = (data['content'], commentId, userId)
+            record = (content, commentId, userId)
             cursor = connection.cursor()
             cursor.execute(query, record)
             
@@ -78,9 +82,7 @@ class ReviewCommentModResource(Resource):
     def delete(self, commentId):
         
         userId = get_jwt_identity()
-        
-        data = request.get_json()
-        
+         
         try:
             connection = get_connection()
             query = '''delete drom review_comment

@@ -34,7 +34,12 @@ class ReviewAddResource(Resource):
             #         '짠맛' : 5,
             #         '단맛' : 3
             #     ],
-
+        storeName = data.get('storeName')
+        storeLat = data.get('storeLat')
+        storeLng = data.get('storeLng')
+        content = data.get('content')
+        rating = data.get('rating')
+            
         try:
             connection = get_connection()
             
@@ -44,7 +49,7 @@ class ReviewAddResource(Resource):
                     where name = %s
                     and lat = %s
                     and lng = %s;'''
-            record = (data['storeName'], data['storeLat'], data['storeLng'])
+            record = (storeName, storeLat, storeLng)
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query,record)                                
             result_list = cursor.fetchall()
@@ -57,26 +62,24 @@ class ReviewAddResource(Resource):
                         (name, lat, lng)
                         values
                         (%s, %s, %s);'''
-                record = (data['storeName'], data['storeLat'], data['storeLng'])
+                record = (storeName, storeLat, storeLng)
                 cursor = connection.cursor(dictionary=True)
                 cursor.execute(query, record)
                 result_list.append({
                     'id' : cursor.lastrowid
                     })
-            # print(result_list)                
-            
+
             # 리뷰 API    
             # 리뷰 글 작성 코드
             query = '''insert into review
                     (userId, storeId, content, rating)
                     values
                     (%s, %s, %s, %s);'''
-            record = (userId, result_list[0]['id'], data['content'], data['rating'])
+            record = (userId, result_list[0]['id'], content, rating)
             cursor = connection.cursor()
             cursor.execute(query,record) 
             
             reviewId = cursor.lastrowid
-            
             # 사진 API
             # 리뷰 사진 넣기
             if 'photo' in request.files:
@@ -117,7 +120,7 @@ class ReviewAddResource(Resource):
             # 태그 중복 확인
                     query = '''select * from tag
                             where name = %s;'''
-                    record = [tag]
+                    record = (tag,)
                     cursor = connection.cursor(dictionary=True)
                     cursor.execute(query, record)
                     result_list = cursor.fetchall()
@@ -126,7 +129,7 @@ class ReviewAddResource(Resource):
                         # 태그 넣기
                         query = '''insert into tag
                                     (name) values (%s);'''
-                        record = [tag]
+                        record = (tag, )
                         cursor = connection.cursor()
                         cursor.execute(query,record)
                         result_list.append({
