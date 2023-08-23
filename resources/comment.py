@@ -16,15 +16,14 @@ class ReviewCommentResource(Resource):
         
         data = request.get_json()
         
-        content = data.get('content')
-        
+
         try:
             connection = get_connection()
             query = '''insert into review_comment
                     (userId, reviewId, content)
                     values 
                     (%s, %s, %s);'''
-            record = (userId, 1, content)
+            record = (userId, 1, data['content'])
             cursor = connection.cursor()
             cursor.execute(query, record)
             
@@ -51,15 +50,13 @@ class ReviewCommentModResource(Resource):
         userId = get_jwt_identity()
         
         data = request.get_json()
-        
-        content = data.get('content')
-        
+  
         try:
             connection = get_connection()
             query = '''update review_comment
                     set content = %s
                     where id = %s and userId = %s;'''
-            record = (content, commentId, userId)
+            record = (data['content'], commentId, userId)
             cursor = connection.cursor()
             cursor.execute(query, record)
             
