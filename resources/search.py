@@ -6,6 +6,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql_connection import get_connection
 from mysql.connector import Error
 
+from utils import date_formatting, decimal_formatting
+
 # 기본 검색 기능 (최대 3~5개만 보이도록 설정)
 class SearchResource(Resource):
     @jwt_required()
@@ -121,17 +123,124 @@ class SearchResource(Resource):
             record = (search_result['id'], userId)
             cursor = connection.cursor()
             cursor.execute(query, record)
+
+
+            # 검색 가게
+                # 관련된 검색 중 평점이 가장 높은 1개를 보여줌
+            query = f'''
+                select s.id, s.name, s.addr, avg(r.rating) as rating
+                from store s
+                    join review r
+                    on s.id = r.storeId
+                where s.name like '%{search}%' or s.addr like '%{search}%'
+                group by s.id
+                order by rating desc
+                limit 1;
+            '''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+            store_search = cursor.fetchone()
             
             # 검색 유저
-            
-            
+            query = f'''
+                select u.id, u.email, u.nickname, u.name, u.profileURL as profile, u.createdAt, u.updatedAt, avg(r.rating) as rating
+                from user u
+                    join review r
+                    on u.id = r.userid
+                where name like '%{search}%' or nickname like '%{search}%'
+                group by u.id
+                order by rating desc
+                limit 1;
+            '''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+            user_search = cursor.fetchone()
+
+                # 검색된 유저가 있다면, 리뷰 글도 검색
+            if user_search != None:
+                query = '''
+                    select rp.photoURL as photo
+                    from user u
+                        join review r
+                        on r.userId = u.id
+                        join review_photo rp
+                        on rp.reviewId = r.id
+                    where u.id = %s
+                    order by r.createdAt desc
+                    limit 10;
+                '''
+                record = (user_search['id'], )
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute(query, record)
+                user_search['reviews'] = cursor.fetchall()
+                
+                # 검색된 유저의 리뷰 게시물 갯수를 불러옴
+                query = '''
+                    select count(rp.reviewId) as reviewsCnt
+                    from user u
+                        join review r
+                        on r.userId = u.id
+                        join review_photo rp
+                        on rp.reviewId = r.id
+                    where u.id = %s;
+                '''
+                record = (user_search['id'], )
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute(query, record)
+                               
+                user_search['reviewsCnt'] = cursor.fetchone()['reviewsCnt']
+                
             # 검색 리뷰 
+            query = f'''
+                select r.*, s.name, s.addr, count(rl.reviewid) as likeCnt, count(rl_my.userId) as isLike
+                from review r
+                    join store s
+                    on r.storeId = s.id
+                    left join review_likes rl
+                    on rl.reviewId = r.id
+                    left join review_likes rl_my
+                    on rl_my.userId = %s
+                where content like '%{search}%'
+                order by r.rating desc
+                limit 1;
+            '''
+            record = (userId, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            review_search = cursor.fetchone()
             
-            
+
             # 검색 모임
+            query = f'''
+                select m.*, u.profileURL as profile, count(ma.meetingId) as attend
+                from meeting m
+                    join user u
+                    on m.userId = u.id
+                    left join meeting_attend ma
+                    on m.id = ma.meetingId
+                where content like '%{search}%' and date > now()
+                group by m.id
+                order by date asc
+                limit 1;
+            '''
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query)
+            meeting_search = cursor.fetchone()
             
-            
-            
+            # 모임 게시판이 있다면 참여한 인원의 프로필을 가져오자
+            if meeting_search != None:
+                query = '''
+                    select u.profileURL as profile
+                    from meeting_attend ma
+                        join user u
+                        on ma.userId = u.id
+                    where meetingId = %s;
+                '''
+                record = (meeting_search['id'], )
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute(query, record)
+                meeting_search['profiles'] = cursor.fetchall()
+  
             
             connection.commit()
             
@@ -143,11 +252,15 @@ class SearchResource(Resource):
                 'result' : 'fail',
                 'error' : str(e)
             }, 500
-        
-        
-        
+            
         return {
-            'result' : 'success'
+            'result' : 'success',
+            'item' : {
+                'store' : decimal_formatting(date_formatting(store_search)),
+                'user' : decimal_formatting(date_formatting(user_search)),
+                'review' : date_formatting(review_search),
+                'meeting' : date_formatting(meeting_search)
+            }
         }
 
 # 최근 검색

@@ -7,7 +7,7 @@ from mysql_connection import get_connection
 from mysql.connector import Error
 
 from config import Config
-from utils import create_file_name
+from utils import create_file_name, date_formatting
 
 import boto3
 
@@ -173,10 +173,9 @@ class MeetingResource(Resource):
             result['profiles'] = cursor.fetchall()
             
             # 날짜 포멧
-            result['date'] = result['date'].isoformat()
-            result['createdAt'] = result['createdAt'].isoformat()
-            result['updatedAt'] = result['updatedAt'].isoformat()
+            date_formatting(result)
             # 소수점 포멧
+            # date_formatting(result)
             result['storeLat'] = float(result['storeLat'])
             result['storeLng'] = float(result['storeLng'])
             

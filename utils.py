@@ -12,3 +12,25 @@ def compare_hash_password(new_password, old_password):
 
 def create_file_name():
     return datetime.now().isoformat().replace(':','_').replace('.', '_') + '.jpg'
+
+def date_formatting(data):
+    if data == None:
+        return 
+    
+    date_list = ['date', 'createdAt', 'updatedAt']
+    for date in date_list:
+        if date in data:
+            data[date] = data[date].isoformat()
+    
+    return data
+
+def decimal_formatting(data):
+    if data == None:
+        return
+    
+    date_list = ['rating', 'lat', 'lng']
+    for date in date_list:
+        if date in data:
+            data[date] = float(data[date])
+    
+    return data

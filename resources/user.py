@@ -34,7 +34,7 @@ class UserRegisterResource(Resource):
             return {
                 'result' : 'fail',
                 'error' : '비밀번호는 최소 6자리 이상입니다.'
-            }, 500
+            }, 400
         
         # 비밀번호 암호화
         hash_password = create_hash_passwrod(data['password'])
@@ -111,13 +111,13 @@ class UserLoginResource(Resource):
                 return {
                     'result' : 'fail',
                     'error' : '회원이 없습니다.'
-                },  500
+                },  400
 
             if not compare_hash_password(data['password'], result_list[0]['password']):
                 return {
                     'result' : 'fail',
                     'error' : '비밀번호가 다릅니다.'
-                },  500
+                },  400
             
             cursor.close()
             connection.close()
@@ -126,7 +126,7 @@ class UserLoginResource(Resource):
             return {
                 'result' : 'fail',
                 'error' : str(e)
-            }
+            }, 500
 
         accessToken = create_access_token(result_list[0]['id'])
 
@@ -147,3 +147,44 @@ class UserLogoutResource(Resource):
         return {
             'result' : 'success'
         }
+    
+class UserEmailFindResource(Resource):
+    def post(self):
+
+        data = request.get_json()
+
+        try:
+            connection = get_connection()
+
+            query = '''
+                select email
+                from user
+                where name = %s and nickname = %s;
+            '''
+            record = (data['name'], data['nickname'])
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '찾는 이메일이 없습니다.'
+                }, 400
+
+            cursor.close()
+            connection.close()
+
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+
+
+        
+        return {
+            'result' : 'success',
+            'email' : result[0]['email']
+        }
+    

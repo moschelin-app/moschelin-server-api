@@ -4,7 +4,7 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from config import Config
 
-from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource
+from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserEmailFindResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
 from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchDetailResource, SearchRelationResource
 from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailsResource, ReviewListResource,ReviewModifyResource
@@ -24,6 +24,8 @@ api = Api(app)
 api.add_resource(UserRegisterResource, '/user/register')
 api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
+# 유저 이메일 찾기
+api.add_resource(UserEmailFindResource, '/user/find/email')
 
 # 리뷰 작성
 api.add_resource( ReviewAddResource , '/review/add')
