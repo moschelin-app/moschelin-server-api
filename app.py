@@ -7,7 +7,7 @@ from config import Config
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserEmailFindResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
 from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource
-from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailsResource, ReviewListResource,ReviewModifyResource
+from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailResource, ReviewListResource,ReviewModifyResource
 from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
 
@@ -30,7 +30,7 @@ api.add_resource(UserEmailFindResource, '/user/find/email')
 # 리뷰 작성
 api.add_resource( ReviewAddResource , '/review/add')
 # 특정 리뷰 관련
-api.add_resource( ReviewModifyResource , '/review/<int:reviewId>')
+api.add_resource( ReviewDetailResource , '/review/<int:reviewId>')
 
 # 댓글 작성
 api.add_resource( ReviewCommentResource , '/review/<int:reviewId>/comment')

@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql.connector import Error
 from mysql_connection import get_connection
 
-from utils import create_file_name
+from utils import create_file_name, date_formatting, decimal_formatting
 from config import Config
 import boto3
 
@@ -63,7 +63,7 @@ class ReviewAddResource(Resource):
                         values
                         (%s, %s, %s);'''
                 record = (storeName, storeLat, storeLng)
-                cursor = connection.cursor(dictionary=True)
+                cursor = connection.cursor()
                 cursor.execute(query, record)
                 result_list.append({
                     'id' : cursor.lastrowid
@@ -239,23 +239,62 @@ class ReviewDeleteResource(Resource):
         return
  
 # 리뷰 상세보기
-class ReviewDetailsResource(Resource):
+class ReviewDetailResource(Resource):
     
     @jwt_required()
     def get(self, reviewId):
         
         userId = get_jwt_identity()
-        
+    
+      
         try:
             connection = get_connection()
             query = '''
-                    dd
-                    '''
-            record = ()
-            cursor = connection.cursor()
+                select r.*, s.id as storeId, s.name storeName,s.lat as storeLat, s.lng storeLng,
+                count(rl.reviewId) as 'likes', count(rc.reviewId) as 'commentCnt', 
+                count(rl_my.userId) as 'isLike'
+                from review r
+                    join store s
+                    on r.storeId = s.id
+                    left join review_likes rl
+                    on rl.reviewId = r.id
+                    left join review_comment rc
+                    on rc.reviewId = r.id
+                    left join review_likes rl_my
+                    on rl_my.userId = %s
+                where r.id = %s;
+                '''
+            record = (userId, reviewId)
+            cursor = connection.cursor(dictionary=True)
             cursor.execute(query,record)
+            result_review = cursor.fetchone()
+            # print(result)           
             
-            connection.commit()
+            query = '''
+                select photoURL as photo
+                from review_photo
+                where reviewId = %s;
+                '''
+            record = (reviewId, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query,record)
+            result_review['photos'] = cursor.fetchall()
+            
+            
+            query = '''
+                select t.name
+                from review_tag rt
+                    join tag t
+                    on rt.tagId = t.id
+                where reviewId = %s;
+                '''
+            record = (reviewId, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_review['tags'] = cursor.fetchall()
+            
+            # connection.commit() # <- 생성, 수정, 삭제시에만 사용하는 코드 commit()을 사용한다.
+                    
             
             cursor.close()
             connection.close()
@@ -265,13 +304,29 @@ class ReviewDetailsResource(Resource):
                 'result':'fail',
                 'error':str(e)
             }, 500
+            
+        # result_review['photos'] = result_photos
+        # result_review['tags'] = result_tags
+            
+        # result_review = date_formatting(result_review)
+        # result_review = decimal_formatting(result_review)
         
-        return
+        # 날짜 포멧
+        # result_review['createdAt'] = result_review['createdAt'].isoformat()
+        # result_review['updatedAt'] = result_review['updatedAt'].isoformat()
+        # 소수점 포멧
+        # result_review['storeLat'] = float(result_review['storeLat'])
+        # result_review['storeLng'] = float(result_review['storeLng'])
+
+
+        return ({'result':'success',
+                'item':decimal_formatting(date_formatting(result_review))
+        })
 
 # 리뷰 리스트 
 class ReviewListResource(Resource):
     def get(self):
-        
+            
         try:
             self
             
