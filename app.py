@@ -6,7 +6,7 @@ from config import Config
 
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserEmailFindResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
-from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchDetailResource, SearchRelationResource
+from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource
 from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailsResource, ReviewListResource,ReviewModifyResource
 from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
@@ -50,8 +50,14 @@ api.add_resource( MeetingAttendResource , '/meeting/<int:meetingId>/attend')
 
 # 검색 기능
 api.add_resource(SearchResource, '/search')
-# 검색 상세보기
-api.add_resource(SearchDetailResource, '/search/detail')
+# 검색 상세보기 유저
+api.add_resource(SearchDetailUserResource, '/search/user')
+# 검색 상세보기 가게
+api.add_resource(SearchDetailStoreResource, '/search/store')
+# 검색 상세보기 리뷰
+api.add_resource(SearchDetailReviewResource, '/search/review')
+# 검색 상세보기 모임
+api.add_resource(SearchDetailMeetingResource, '/search/meeting')
 # 최근 검색
 api.add_resource(SearchResentResource, '/search/recent')
 # 최근 검색 삭제
