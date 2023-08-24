@@ -19,7 +19,7 @@ def date_formatting(data):
     
     date_list = ['date', 'createdAt', 'updatedAt']
     for date in date_list:
-        if date in data:
+        if date in data and data[date] != None:
             data[date] = data[date].isoformat()
     
     return data
@@ -28,7 +28,7 @@ def decimal_formatting(data):
     if data == None:
         return
     
-    date_list = ['rating', 'lat', 'lng']
+    date_list = ['rating', 'storeLat', 'storeLng']
     for date in date_list:
         if date in data:
             data[date] = float(data[date])
