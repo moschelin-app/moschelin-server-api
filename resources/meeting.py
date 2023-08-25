@@ -25,7 +25,7 @@ class MeetingCreateResource(Resource):
         #         'maximun' : 4,
         #         'image' : '이미지'
         #     }
-        check_list = ['content', 'date', 'maximum', 'storeName', 'storeLat', 'storeLng']
+        check_list = ['content', 'date', 'maximum', 'storeName', 'storeLat', 'storeLng', 'storeAddr']
         data = request.form
         
         for check in check_list:
@@ -37,6 +37,7 @@ class MeetingCreateResource(Resource):
 
         userId = get_jwt_identity()
         
+        storeAddr = data.get('storeAddr')
         storeName = data.get('storeName')
         storeLat = data.get('storeLat')
         storeLng = data.get('storeLng')
@@ -44,9 +45,11 @@ class MeetingCreateResource(Resource):
         date = data.get('date')
         maximum = data.get('maximum')
         
-        file_name == ''
+        
        
         try:
+            file_name = ''
+            
             if 'photo' in request.files:
                 file_name = create_file_name()
                 
@@ -86,11 +89,11 @@ class MeetingCreateResource(Resource):
             if result == None:
                 query = '''
                     insert into store
-                    (name, lat, lng)
+                    (name, addr, lat, lng)
                     values
-                    (%s, %s, %s);
+                    (%s,%s, %s, %s);
                 '''
-                record = (storeName, storeLat, storeLng)
+                record = (storeName,storeAddr, storeLat, storeLng)
                 
                 cursor = connection.cursor()
                 cursor.execute(query, record)
@@ -206,7 +209,7 @@ class MeetingResource(Resource):
         #         'maximun' : 4,
         #         'image' : '이미지'
         #     }
-        check_list = ['content', 'date', 'maximum', 'storeName', 'storeLat', 'storeLng']
+        check_list = ['content', 'date', 'maximum', 'storeName', 'storeLat', 'storeLng', 'storeAddr']
         data = request.form
         
         for check in check_list:
@@ -218,6 +221,7 @@ class MeetingResource(Resource):
 
         userId = get_jwt_identity()
         
+        storeAddr = data.get('storeAddr')
         storeName = data.get('storeName')
         storeLat = data.get('storeLat')
         storeLng = data.get('storeLng')
@@ -226,9 +230,11 @@ class MeetingResource(Resource):
         maximum = data.get('maximum')
         
         
-        file_name = ''
+
         
         try:
+            file_name = ''
+            
             if 'photo' in request.files:
                 file_name = create_file_name()
                 
@@ -284,11 +290,11 @@ class MeetingResource(Resource):
             if result == None:
                 query = '''
                     insert into store
-                    (name, lat, lng)
+                    (name,addr, lat, lng)
                     values
                     (%s, %s, %s);
                 '''
-                record = (storeName, storeLat, storeLng)
+                record = (storeName,storeAddr ,storeLat, storeLng)
                 
                 cursor = connection.cursor()
                 cursor.execute(query, record)
