@@ -6,7 +6,7 @@ from config import Config
 
 from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserEmailFindResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
-from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource
+from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource, SearchPlaceResource
 from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailResource, ReviewListResource,ReviewModifyResource
 from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
@@ -65,7 +65,8 @@ api.add_resource(SearchResentDeleteResource, '/search/recent/delete/<int:searchI
 # 연관 검색
 api.add_resource(SearchRelationResource, '/search/relation')
 
-
+# 모임, 리뷰에서 검색하는 가게 검색 (구글 API)
+api.add_resource(SearchPlaceResource, '/search/place')
 
 if __name__ == '__main__':
     app.run()

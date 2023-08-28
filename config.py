@@ -19,6 +19,9 @@ class Config:
     S3_BUCKET = 'aws-moschelin-s3'
     S3_Base_URL = f'https://{S3_BUCKET}.s3.amazonaws.com/'
     
+    GOOGLE_KEY = 'AIzaSyDPTSlAy52MeqFpGF3V7vcwR663Cxv02eM'
+
+    
     
     
     

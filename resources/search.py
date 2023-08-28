@@ -6,7 +6,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql_connection import get_connection
 from mysql.connector import Error
 
-from utils import date_formatting, decimal_formatting
+from utils import date_formatting, decimal_formatting, get_google_place, get_google_next_token
+
 
 # 기본 검색 기능 (최대 3~5개만 보이도록 설정)
 class SearchResource(Resource):
@@ -263,7 +264,7 @@ class SearchResource(Resource):
             }
         }
         
-# 검색 상세보기
+# 가게 검색 상세보기
 class SearchDetailStoreResource(Resource):
     @jwt_required()
     def get(self):
@@ -322,6 +323,7 @@ class SearchDetailStoreResource(Resource):
         }
 
 
+# 유저 검색 상세보기
 class SearchDetailUserResource(Resource):
     @jwt_required()
     def get(self):
@@ -407,6 +409,7 @@ class SearchDetailUserResource(Resource):
             'items' : result_list
         }
     
+# 리뷰 검색 상세보기    
 class SearchDetailReviewResource(Resource):
     @jwt_required()
     def get(self):
@@ -465,7 +468,7 @@ class SearchDetailReviewResource(Resource):
             'items' : result_list
         }
         
-        
+# 모임 검색 상세보기        
 class SearchDetailMeetingResource(Resource):
     @jwt_required()
     def get(self):
@@ -642,3 +645,60 @@ class SearchRelationResource(Resource):
             'count' : len(result_list),
             'items' : result_list
         }
+        
+        
+        
+# 주변 장소 검색 및 가게 검색        
+class SearchPlaceResource(Resource):
+    def get(self):
+        
+        data = request.args
+        
+        # 다음 장 nextpagetoken이 존재하면
+        if 'nextPageToken' in data:
+            nextPageToken = data.get('nextPageToken')
+            
+            try:
+                next_page_token, result_list = get_google_next_token(nextPageToken)
+            except Exception as e:
+                return {
+                    'result':'fail',
+                    'error' : str(e)
+                }, 500
+
+            return {
+                'result' : 'success',
+                'nextPageToken' : next_page_token,
+                'items' : result_list
+            }      
+        
+        # 처음 검색 
+        else :
+            check_list = ['lat', 'lng', 'search']
+            for check in check_list:
+                if check not in data:
+                    return {
+                        'result' : 'fail',
+                        'error' : '필수 항목을 확인하세요.'
+                    }, 400
+            
+            lat = data.get('lat')
+            lng = data.get('lng')
+            search = data.get('search')
+            
+            try:
+                next_page_token, result_list = get_google_place(lat, lng, search)
+            except Exception as e:
+                return {
+                    'result':'fail',
+                    'error' : str(e)
+                }, 500
+
+            return {
+                'result' : 'success',
+                'nextPageToken' : next_page_token,
+                'items' : result_list
+            }          
+        
+        
+        

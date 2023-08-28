@@ -228,10 +228,7 @@ class MeetingResource(Resource):
         content = data.get('content')
         date = data.get('date')
         maximum = data.get('maximum')
-        
-        
-
-        
+ 
         try:
             file_name = ''
             
