@@ -10,6 +10,7 @@ from resources.search import SearchResentDeleteResource, SearchResource, SearchR
 from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDetailResource, ReviewListResource,ReviewModifyResource
 from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
+from resources.maps import MapsGetStoreResource, MapGetReviewResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -67,6 +68,12 @@ api.add_resource(SearchRelationResource, '/search/relation')
 
 # 모임, 리뷰에서 검색하는 가게 검색 (구글 API)
 api.add_resource(SearchPlaceResource, '/search/place')
+
+
+# 지도 상세보기에서 주위 가게 검색
+api.add_resource(MapsGetStoreResource, '/maps')
+# 지도 상세보기에서 가게 선택시 리뷰 보여줌
+api.add_resource(MapGetReviewResource, '/maps/<int:storeId>')
 
 if __name__ == '__main__':
     app.run()

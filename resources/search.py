@@ -9,21 +9,22 @@ from mysql.connector import Error
 from utils import date_formatting, decimal_formatting, get_google_place, get_google_next_token
 
 
-# 기본 검색 기능 (최대 3~5개만 보이도록 설정)
+# 기본 검색 기능 (최대 1개만 보이도록 설정)
 class SearchResource(Resource):
     @jwt_required()
     def get(self):
         
         userId = get_jwt_identity()
         
-        search = request.args.get('search')
+        data = request.args
         
-        if 'search' == None:
+        if 'search' not in data:
             return {
                 'result' : 'fail',
                 'error' : '검색어가 필요합니다.'
-            }, 500
+            }, 400
 
+        search = data.get('search')
 
         try:
             connection = get_connection()
@@ -193,15 +194,16 @@ class SearchResource(Resource):
                 
             # 검색 리뷰 
             query = f'''
-                select r.*, s.name, s.addr, count(rl.reviewid) as likeCnt, count(rl_my.userId) as isLike
+                select r.*, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
                 from review r
                     join store s
                     on r.storeId = s.id
                     left join review_likes rl
                     on rl.reviewId = r.id
                     left join review_likes rl_my
-                    on rl_my.userId = %s
+                    on r.id = rl_my.reviewId and rl_my.userId = %s
                 where r.content like '%{search}%'
+                group by r.id
                 order by r.rating desc
                 limit 1;
             '''
@@ -259,7 +261,7 @@ class SearchResource(Resource):
             'item' : {
                 'store' : decimal_formatting(date_formatting(store_search)),
                 'user' : decimal_formatting(date_formatting(user_search)),
-                'review' : date_formatting(review_search),
+                'review' : decimal_formatting(date_formatting(review_search)),
                 'meeting' : date_formatting(meeting_search)
             }
         }
@@ -432,19 +434,20 @@ class SearchDetailReviewResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select r.*, s.name, s.addr, count(rl.reviewid) as likeCnt, count(rl_my.userId) as isLike
+                select r.*, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
                 from review r
                     join store s
                     on r.storeId = s.id
                     left join review_likes rl
                     on rl.reviewId = r.id
                     left join review_likes rl_my
-                    on rl_my.userId = %s
+                    on r.id = rl_my.reviewId and rl_my.userId = %s
                 where r.content like '%{search}%'
                 group by r.id
                 order by r.rating desc
                 limit {offset}, {limit};
             '''
+
             record = (userId, )
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -460,7 +463,7 @@ class SearchDetailReviewResource(Resource):
             }, 500     
         
         for i in range(len(result_list)):
-            result_list[i] = date_formatting(result_list[i])
+            result_list[i] = decimal_formatting(date_formatting(result_list[i]))
             
         return {
             'result' : 'success',

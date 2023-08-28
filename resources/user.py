@@ -21,6 +21,13 @@ class UserRegisterResource(Resource):
         # }
         
         data = request.get_json()
+        check_list = ['email', 'password', 'name', 'nickname']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목을 확인하세요.'
+                }, 400
 
         try:
             validate_email(data['email'])
@@ -28,13 +35,13 @@ class UserRegisterResource(Resource):
             return {
                 'result' : 'fail',
                 'error' : str(e)
-            }, 400
+            }, 401
             
         if len(data['password']) < 6:
             return {
                 'result' : 'fail',
                 'error' : '비밀번호는 최소 6자리 이상입니다.'
-            }, 400
+            }, 402
         
         # 비밀번호 암호화
         hash_password = create_hash_passwrod(data['password'])
@@ -55,7 +62,7 @@ class UserRegisterResource(Resource):
                 return {
                     'result' : 'fail',
                     'error' : '이미 있는 회원입니다.'
-                }, 400
+                }, 403
             
             query = '''
                 insert into user
@@ -117,7 +124,7 @@ class UserLoginResource(Resource):
                 return {
                     'result' : 'fail',
                     'error' : '비밀번호가 다릅니다.'
-                },  400
+                },  401
             
             cursor.close()
             connection.close()

@@ -427,7 +427,7 @@ class MeetingAttendResource(Resource):
                 return {
                     'result' : 'fail',
                     'error' : '더 이상 모임에 참가할 수 없습니다.'
-                }, 400
+                }, 402
             
             
             
