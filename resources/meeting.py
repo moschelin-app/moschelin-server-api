@@ -138,16 +138,18 @@ class MeetingCreateResource(Resource):
 # 모임 URL
 class MeetingResource(Resource):
     # 특정 모임 상세보기
-    @jwt_required(optional=True)
+    @jwt_required()
     def get(self, meetingId):
+        
+        userId = get_jwt_identity()
         
         try:
             connection = get_connection()
             
-            query = '''
+            query = f'''
                 select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.createdAt, m.updatedAt, 
                     u.nickname, u.profileURL as profile, s.id as storeId, s.name as storeName, 
-                    s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend
+                    s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend, , if(m.userId = {userId}, 1, 0) isMine
                 from meeting m
                     join user u
                     on m.userId = u.id
@@ -232,6 +234,8 @@ class MeetingResource(Resource):
         try:
             file_name = ''
             
+            connection = get_connection()
+            
             if 'photo' in request.files:
                 file_name = create_file_name()
                 
@@ -251,9 +255,8 @@ class MeetingResource(Resource):
                         'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
                     }
                 )
-            
-            connection = get_connection()
-            
+                
+ 
             # 등록된 모임이 있는지 확인
             query = '''
                 select * 
