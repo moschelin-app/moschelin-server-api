@@ -102,8 +102,10 @@ class MapGetReviewResource(Resource):
                 'error' : str(e)
             }, 500
             
+        result = decimal_formatting(date_formatting(result))
+        result['rating'] = int(result['rating'])
         
         return {
             'result' : 'success',
-            'item' : decimal_formatting(date_formatting(result))
+            'item' : result
         }
