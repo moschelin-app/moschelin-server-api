@@ -130,7 +130,7 @@ class SearchResource(Resource):
             # 검색 가게
                 # 관련된 검색 중 평점이 가장 높은 1개를 보여줌
             query = f'''
-                select s.id, s.name, s.addr, ifnull(avg(r.rating) ,0) as rating
+                select s.id storeId, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
                 from store s
                     join review r
                     on s.id = r.storeId
@@ -194,10 +194,12 @@ class SearchResource(Resource):
                 
             # 검색 리뷰 
             query = f'''
-                select r.*, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
+                select r.*,ifnull(rp.photoURL, '') photo, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
                 from review r
                     join store s
                     on r.storeId = s.id
+                    left join review_photo rp
+                    on r.id = rp.reviewId
                     left join review_likes rl
                     on rl.reviewId = r.id
                     left join review_likes rl_my
@@ -291,7 +293,7 @@ class SearchDetailStoreResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select s.id, s.name as storeName, s.addr,s.lat as storeLat, s.lng as storeLng, ifnull(avg(r.rating) ,0) as rating
+                select s.id storeId, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
                 from store s
                     left join review r
                     on s.id = r.storeId
@@ -434,10 +436,12 @@ class SearchDetailReviewResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select r.*, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
+                select r.*,ifnull(rp.photoURL, '') photo, s.name as storeName, s.addr as storeAddr, s.lat as storeLat, s.lng as storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
                 from review r
                     join store s
                     on r.storeId = s.id
+                    left join review_photo rp
+                    on r.id = rp.reviewId
                     left join review_likes rl
                     on rl.reviewId = r.id
                     left join review_likes rl_my

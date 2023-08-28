@@ -271,7 +271,7 @@ class MeetingResource(Resource):
                 return {
                     'result' : 'fail',
                     'error' : '수정할 모임이 존재하지 않습니다.'
-                }, 400
+                }, 402
             
             
             # 가게 정보 찾아봄. 

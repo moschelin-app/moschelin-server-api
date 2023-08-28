@@ -11,6 +11,7 @@ from resources.review import ReviewAddResource, ReviewDeleteResource, ReviewDeta
 from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
 from resources.maps import MapsGetStoreResource, MapGetReviewResource
+from resources.store import StoreGetMeetingResource, StoreGetReviewResource, StoreResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -74,6 +75,14 @@ api.add_resource(SearchPlaceResource, '/search/place')
 api.add_resource(MapsGetStoreResource, '/maps')
 # 지도 상세보기에서 가게 선택시 리뷰 보여줌
 api.add_resource(MapGetReviewResource, '/maps/<int:storeId>')
+
+
+# 가게 정보 상세보기
+api.add_resource(StoreResource, '/store/<int:storeId>')
+# 가게 상세보기에서 리뷰 정보 보여주기
+api.add_resource(StoreGetReviewResource, '/store/<int:storeId>/review')
+# 가게 상세보기에서 모임 정보 보여주기
+api.add_resource(StoreGetMeetingResource, '/store/<int:storeId>/meeting')
 
 if __name__ == '__main__':
     app.run()

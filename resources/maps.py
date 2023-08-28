@@ -73,10 +73,12 @@ class MapGetReviewResource(Resource):
             connection = get_connection()
             
             query = '''
-                select r.*, s.name as storeName, s.addr as storeAddr, s.lat storeLat, s.lng storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
+                select r.*,ifnull(rp.photoURL, '') photo, s.name as storeName, s.addr as storeAddr, s.lat storeLat, s.lng storeLng, count(rl.reviewid) as likeCnt, if(rl_my.userId, 1, 0) as isLike
                 from review r
                     join store s
                     on s.id = r.storeId
+                    left join review_photo rp
+                    on r.id = rp.reviewId
                     left join review_likes rl
                     on rl.reviewId = r.id
                     left join review_likes rl_my
