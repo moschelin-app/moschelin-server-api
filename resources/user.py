@@ -6,8 +6,8 @@ from utils import create_hash_passwrod, compare_hash_password
 from mysql.connector import Error
 from mysql_connection import get_connection
 
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required
-
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
+from utils import date_formatting
 
 # 유저 회원가입
 class UserRegisterResource(Resource):
@@ -155,6 +155,8 @@ class UserLogoutResource(Resource):
             'result' : 'success'
         }
     
+    
+# 유저 이메일 찾기
 class UserEmailFindResource(Resource):
     def post(self):
 
@@ -195,3 +197,156 @@ class UserEmailFindResource(Resource):
             'email' : result[0]['email']
         }
     
+# 유저 정보 보기
+class UserInfoResource(Resource):
+    @jwt_required()
+    def get(self, user_id):
+        
+        userId = get_jwt_identity()
+        
+        try:
+            connection = get_connection()
+            
+            query = '''
+                select id, email, nickname, name, profileURL profile, createdAt, updatedAt, if(id = %s, 1,0) isMine
+                from user 
+                where id = %s;
+            '''
+            record = (userId, user_id)
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result = cursor.fetchone()
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'success',
+                'error' : str(e)
+            }, 500
+        
+        
+        
+        return {
+            'result' : 'success',
+            'item' : date_formatting(result)
+        }
+        
+        
+# 유저 정보에서 유저가 작성한 리뷰 가져오기   
+class UserInfoReviewResource(Resource):
+    @jwt_required()
+    def get(self, user_id):
+        
+        data = request.args
+        
+        check_lsit = ['offset', 'limit']
+        for check in check_lsit:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목이 존재하지 않습니다.'
+                }, 400
+        
+        offset = data.get('offset')
+        limit = data.get('limit')
+        
+        try:
+            connection = get_connection()
+            
+            query = f'''
+                select r.id, ifnull(rp.photoURL, '') photo
+                from user u
+                    join review r
+                    on r.userId = u.id and u.id = %s
+                    left join review_photo rp
+                    on r.id = rp.reviewId
+                group by r.id
+                order by r.createdAt desc
+                limit {offset}, {limit};
+            '''
+            record = (user_id,)
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_list = cursor.fetchall()
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+        
+        
+        return {
+            'result' : 'success',
+            'count' : len(result_list),
+            'items' : result_list
+        }
+        
+        
+        
+# 유저 정보에서 유저가 좋아요 누른 리뷰 가져오기
+class UserInfoLikesResource(Resource):
+    @jwt_required()
+    def get(self, user_id):
+        
+        data = request.args
+        
+        check_lsit = ['offset', 'limit']
+        for check in check_lsit:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목이 존재하지 않습니다.'
+                }, 400
+        
+        offset = data.get('offset')
+        limit = data.get('limit')
+        
+        try:
+            connection = get_connection()
+            
+            query = f'''
+                select r.id, ifnull(rp.photoURL, '') photo
+                from user u
+                    join review_likes rl
+                    on u.id = rl.userId and u.id = %s
+                    join review r
+                    on r.id = rl.reviewId
+                    left join review_photo rp
+                    on r.id = rp.reviewId
+                group by r.id
+                order by rl.createdAt desc
+                limit {offset}, {limit};
+            '''
+            record = (user_id, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_list = cursor.fetchall()
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+        
+        
+        return {
+            'result' : 'success',
+            'count' : len(result_list),
+            'items' : result_list
+        } 
+        
+        
+        
+        
+        
+        
+        
