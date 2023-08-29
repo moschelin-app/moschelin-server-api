@@ -199,23 +199,15 @@ class UserEmailFindResource(Resource):
             'result' : 'success',
             'email' : result[0]['email']
         }
-    
-# 유저 정보
-class UserInfoResource(Resource):
-    
+
+# 유저 정보 수정
+class UserInfoEditResource(Resource):
     # 유저 정보 수정
     @jwt_required()
-    def put(self, user_id):
+    def put(self):
         
         userId = get_jwt_identity()
         
-        # 자신의 유저 정보 인지 확인
-        if user_id != userId:
-            return {
-                'result' : 'fail',
-                'error' : '잘못된 접근입니다.'
-            }, 402
-            
         data = request.form
         
         check_list = ['email', 'name', 'nickname']
@@ -237,7 +229,7 @@ class UserInfoResource(Resource):
             return {
                 'result' : 'fail',
                 'error' : str(e)
-            }, 403
+            }, 402
         
         try:
             connection = get_connection()
@@ -269,7 +261,7 @@ class UserInfoResource(Resource):
                 set email = %s, nickname = %s, name = %s, profileURL = %s
                 where id = %s;
             '''
-            record = (email, nickname, name, None if file_name == '' else Config.S3_Base_URL + file_name, user_id)
+            record = (email, nickname, name, None if file_name == '' else Config.S3_Base_URL + file_name, userId)
             cursor = connection.cursor()
             cursor.execute(query, record)
             
@@ -290,7 +282,7 @@ class UserInfoResource(Resource):
                     set password = %s
                     where id = %s;
                 '''
-                record = (hash_password, user_id)
+                record = (hash_password, userId)
                 cursor = connection.cursor()
                 cursor.execute(query, record)
             
@@ -308,7 +300,9 @@ class UserInfoResource(Resource):
         return {
             'result' : 'success'
         }
-    
+
+# 유저 정보
+class UserInfoResource(Resource):
     # 유저 정보 확인
     @jwt_required()
     def get(self, user_id):
