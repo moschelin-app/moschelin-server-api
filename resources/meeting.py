@@ -509,7 +509,7 @@ class MeetingAttendResource(Resource):
 
 # 위치 주위의 모임 리스트 가져오기
 class MeetingGetAllResource(Resource):
-    @jwt_required(optional=True)
+    @jwt_required()
     def get(self):
         
         data = request.args

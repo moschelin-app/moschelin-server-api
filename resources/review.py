@@ -163,7 +163,7 @@ class ReviewAddResource(Resource):
         return{'result':'success'}
     
 # 리뷰 수정 
-class ReviewModifyResource(Resource):
+class ReviewResource(Resource):
     @jwt_required()
     def put(self, reviewId):
         
@@ -208,8 +208,6 @@ class ReviewModifyResource(Resource):
         
         return{'result':'success'}
 
-# 리뷰 삭제
-class ReviewDeleteResource(Resource):
     @jwt_required()
     def delete(self, storeId):
         
@@ -237,9 +235,6 @@ class ReviewDeleteResource(Resource):
             }, 500
         
         return
- 
-# 리뷰 상세보기
-class ReviewDetailResource(Resource):
     
     @jwt_required()
     def get(self, reviewId):
@@ -322,15 +317,96 @@ class ReviewDetailResource(Resource):
         return ({'result':'success',
                 'item':decimal_formatting(date_formatting(result_review))
         })
+    
 
 # 리뷰 리스트 
 class ReviewListResource(Resource):
+    @jwt_required()
     def get(self):
+        
+        data = request.args
+        
+        check_list = ['lat', 'lng', 'offset', 'limit', 'dis']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목을 확인해야합니다.'
+                }, 400
+        
+        lat = data.get('lat')
+        lng = data.get('lng')
+        dis = data.get('dis')
+        offset = data.get('offset')
+        limit = data.get('limit')
+        
+        
+        userId = get_jwt_identity()
             
         try:
-            self
+            connection = get_connection()
+            
+            query = f'''
+                select r.*, u.nickname, ifnull(u.profileUrl, '') profile, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng
+                    ,rp.photoURL photo, count(rc.id) commecntCnt, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLIke, s.dis
+                from (select *, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
+
+                    -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as dis
+                from store) s
+                    join review r
+                    on s.id = r.storeId
+                    join user u 
+                    on u.id = r.userId
+                    left join review_photo rp
+                    on r.id = rp.reviewId
+                    left join review_comment rc
+                    on rc.reviewId = r.id
+                    left join review_likes rl
+                    on rl.reviewId = r.id
+                    left join review_likes rl_my
+                    on rl_my.reviewId = r.id and rl_my.userId = %s
+                where dis < %s
+                group by r.id
+                order by dis asc
+                limit {offset}, {limit};
+            '''
+            record = (userId, dis)
+            
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_list = cursor.fetchall()
+            
+            
+            for i in range(len(result_list)):
+                query = '''
+                    select t.name
+                    from review_tag rt
+                        join tag t
+                        on t.id = rt.tagId and rt.reviewId = %s;
+                '''
+                
+                record = (result_list[i]['id'], )
+            
+                cursor = connection.cursor(dictionary=True)
+                cursor.execute(query, record)
+                result_list[i]['tags'] = cursor.fetchall()
+                
+                result_list[i] = decimal_formatting(date_formatting(result_list[i]))
+                result_list[i]['rating'] = int(result_list[i]['rating'])
+            
+            cursor.close()
+            connection.close()
             
         except Error as e:
-            return
+            return {
+                'result' : 'fail',
+                'error ': str(e)
+            }, 500
+            
+         
         
-        return
+        return {
+            'result' : 'success',
+            'count' : len(result_list),
+            'items' : result_list
+        }
