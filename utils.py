@@ -29,7 +29,7 @@ def decimal_formatting(data):
     if data == None:
         return
     
-    date_list = ['rating', 'storeLat', 'storeLng', 'dis']
+    date_list = ['rating', 'storeLat', 'storeLng', 'distance']
     for date in date_list:
         if date in data:
             data[date] = float(data[date])

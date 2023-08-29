@@ -351,7 +351,7 @@ class ReviewListResource(Resource):
                     ,rp.photoURL photo, count(rc.id) commecntCnt, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLIke, s.dis
                 from (select *, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
-                    -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as dis
+                    -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
                 from store) s
                     join review r
                     on s.id = r.storeId
@@ -365,7 +365,7 @@ class ReviewListResource(Resource):
                     on rl.reviewId = r.id
                     left join review_likes rl_my
                     on rl_my.reviewId = r.id and rl_my.userId = %s
-                where dis < %s
+                where s.distance < %s
                 group by r.id
                 order by dis asc
                 limit {offset}, {limit};
