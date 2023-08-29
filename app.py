@@ -36,10 +36,11 @@ api.add_resource( ReviewResource , '/review/<int:reviewId>')
 # 리뷰 리스트 가져오기
 api.add_resource(ReviewListResource, '/review/list')
 
-# 댓글 작성
+# 리뷰 댓글 관련
 api.add_resource( ReviewCommentResource , '/review/<int:reviewId>/comment')
 # 특정 댓글 관련
 api.add_resource( ReviewCommentModResource , '/review/comment/<commentId>')
+
 # 리뷰 좋아요
 api.add_resource( ReviewLikeResource , '/review/<int:reviewId>/like')
 

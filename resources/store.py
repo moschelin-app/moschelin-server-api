@@ -159,7 +159,7 @@ class StoreGetMeetingResource(Resource):
             
             
             query = f'''
-                select m.id, m.userId, m.storeId, m.content, m.date, ifnull(m.photoURL, '') photo, m.maximum, m.createdAt, m.updatedAt
+                select m.id, m.userId, m.storeId, m.content, m.date, ifnull(m.photoURL, '') photo, m.maximum, m.pay, m.createdAt, m.updatedAt
                     , u.nickname, ifnull(u.profileURL, '') as profile, count(ma.meetingId) attend, if(m.userId = {userId}, 1, 0) isMine
                 from store s
                     join meeting m
