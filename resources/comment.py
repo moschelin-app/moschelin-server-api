@@ -74,14 +74,39 @@ class ReviewCommentResource(Resource):
         
         data = request.get_json()
         
+        check_list = ['content']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목이 존재하지 않습니다.'
+                }, 400
+        
 
         try:
             connection = get_connection()
+            
+            query = '''
+                    select *
+                    from review
+                    where id = %s;
+                    '''
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '리뷰가 존재하지 않습니다.'
+                }, 402
+            
+            
             query = '''insert into review_comment
                     (userId, reviewId, content)
                     values 
                     (%s, %s, %s);'''
-            record = (userId, 1, data['content'])
+            record = (userId, reviewId, data['content'])
             cursor = connection.cursor()
             cursor.execute(query, record)
             
@@ -108,9 +133,35 @@ class ReviewCommentModResource(Resource):
         userId = get_jwt_identity()
         
         data = request.get_json()
+        
+        check_list = ['content']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목이 존재하지 않습니다.'
+                }, 400
+        
   
         try:
             connection = get_connection()
+            
+            query = '''
+                    select *
+                    from review_comment
+                    where id = %s and userId = %s;'''
+            record = (commentId, userId)
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '해당 댓글을 찾을 수 없습니다.'
+                }, 402
+            
+            
             query = '''update review_comment
                     set content = %s
                     where id = %s and userId = %s;'''
@@ -140,6 +191,23 @@ class ReviewCommentModResource(Resource):
          
         try:
             connection = get_connection()
+            
+            query = '''
+                    select *
+                    from review_comment
+                    where id = %s and userId = %s;'''
+            record = (commentId, userId)
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '해당 댓글을 찾을 수 없습니다.'
+                }, 402
+            
+            
             query = '''delete drom review_comment
                     where id = %s
                     and userId = %s'''
@@ -157,4 +225,4 @@ class ReviewCommentModResource(Resource):
                 'error':str(e)
             }, 500
         
-        return
+        return{'result':'success'}
