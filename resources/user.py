@@ -7,7 +7,10 @@ from mysql.connector import Error
 from mysql_connection import get_connection
 
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
-from utils import date_formatting
+from utils import date_formatting, create_file_name
+from config import Config
+
+import boto3
 
 # 유저 회원가입
 class UserRegisterResource(Resource):
@@ -197,8 +200,116 @@ class UserEmailFindResource(Resource):
             'email' : result[0]['email']
         }
     
-# 유저 정보 보기
+# 유저 정보
 class UserInfoResource(Resource):
+    
+    # 유저 정보 수정
+    @jwt_required()
+    def put(self, user_id):
+        
+        userId = get_jwt_identity()
+        
+        # 자신의 유저 정보 인지 확인
+        if user_id != userId:
+            return {
+                'result' : 'fail',
+                'error' : '잘못된 접근입니다.'
+            }, 402
+            
+        data = request.form
+        
+        check_list = ['email', 'name', 'nickname']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목을 확인하세요.'
+                }, 400
+        
+        email = data.get('email')
+        name = data.get('name')
+        nickname = data.get('nickname')
+        
+        # 이메일 유효성
+        try:
+            validate_email(email)
+        except EmailNotValidError as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 403
+        
+        try:
+            connection = get_connection()
+            
+            file_name = ''
+            
+            if 'profile' in request.files:
+                file_name = create_file_name()
+                
+                s3 = boto3.client(
+                    's3',
+                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY
+                )
+                
+                # 파일 업로드
+                s3.upload_fileobj(
+                    request.files['profile'],
+                    Config.S3_BUCKET,
+                    file_name,
+                    ExtraArgs = {
+                        'ACL' : 'public-read', # 모든 사람들이 사진을 볼수 있어야함. 권한 설정
+                        'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
+                    }
+                )
+            # 수정
+            query = '''
+                update user
+                set email = %s, nickname = %s, name = %s, profileURL = %s
+                where id = %s;
+            '''
+            record = (email, nickname, name, None if file_name == '' else Config.S3_Base_URL + file_name, user_id)
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            
+            # 비밀번호 변경
+            if 'password' in data:
+                password = data.get('password')
+                if len(password) < 6:
+                    return {
+                        'result' : 'fail',
+                        'error' : '비밀번호는 최소 6자리 이상입니다.'
+                    }, 403
+                
+                 # 비밀번호 암호화
+                hash_password = create_hash_passwrod(password)
+                    
+                query = '''
+                    update user
+                    set password = %s
+                    where id = %s;
+                '''
+                record = (hash_password, user_id)
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+            
+            connection.commit()
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+        
+        return {
+            'result' : 'success'
+        }
+    
+    # 유저 정보 확인
     @jwt_required()
     def get(self, user_id):
         
@@ -343,10 +454,6 @@ class UserInfoLikesResource(Resource):
             'count' : len(result_list),
             'items' : result_list
         } 
-        
-        
-        
-        
-        
+             
         
         

@@ -28,7 +28,7 @@ api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
 # 유저 이메일 찾기
 api.add_resource(UserEmailFindResource, '/user/find/email')
-# 유저 정보 보기
+# 유저 정보 보기/수정
 api.add_resource(UserInfoResource, '/user/<int:user_id>')
 # 유저 정보에서 작성한 리뷰 보기
 api.add_resource(UserInfoReviewResource, '/user/<int:user_id>/review')
