@@ -64,8 +64,24 @@ class UserRegisterResource(Resource):
             if len(result_list) > 0:
                 return {
                     'result' : 'fail',
-                    'error' : '이미 있는 회원입니다.'
+                    'error' : '이미 사용중인 이메일 입니다.'
                 }, 403
+                
+                
+            query = """
+                select *
+                from user
+                where nickname = %s;
+            """
+            record = (data['nickname'], )
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result_list = cursor.fetchall()
+            if len(result_list) > 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '이미 사용중인 닉네임 입니다.'
+                }, 405
             
             query = '''
                 insert into user
