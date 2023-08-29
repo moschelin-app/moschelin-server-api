@@ -17,6 +17,39 @@ class ReviewLikeResource(Resource):
         
         try:
             connection = get_connection()
+            
+            query = '''
+                    select *
+                    from review
+                    where id = %s;
+                    '''
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '해당 리뷰를 찾을 수 없습니다.'
+                }, 400
+            
+            query = '''
+                    select *
+                    from review_likes
+                    where userId = %s and reviewId = %s;
+                    '''
+            record = (userId, reviewId)
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            
+            if len(result) >= 1:
+                return {
+                    'result' : 'fail',
+                    'error' : '해당 리뷰에 이미 좋아요를 했습니다.'
+                }, 402
+            
+            
             query = '''insert into review_likes 
                     (userId, reviewId)
                     values 
@@ -46,6 +79,23 @@ class ReviewLikeResource(Resource):
         
         try:
             connection = get_connection()
+            
+            query = '''
+                    select *
+                    from review
+                    where id = %s;
+                    '''
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            result = cursor.fetchall()
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '해당 리뷰를 찾을 수 없습니다.'
+                }, 400
+            
+            
             query = '''delete from review_likes 
                     where userId = %s 
                     and reviewId = %s;'''
@@ -66,7 +116,7 @@ class ReviewLikeResource(Resource):
         
         return{
             'result':'success'
-        }, 200
+        }
         
         
         
