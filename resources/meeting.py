@@ -538,7 +538,7 @@ class MeetingGetAllResource(Resource):
             query = f'''
                 select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum,m.pay, m.createdAt, m.updatedAt
                 , s.name as 'storeName', s.addr as 'storeAddr', s.lat as 'storeLat', s.lng as 'storeLng',s.distance, count(ma.userId) attend
-                from (select id, name,lat, lng, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
+                from (select id, name, addr, lat, lng, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
                     -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
                 from store) s
@@ -584,7 +584,7 @@ class MeetingGetAllResource(Resource):
                
         except Error as e:
             return {
-                'result' : 'success',
+                'result' : 'fail',
                 'error' : str(e)
             }, 500
 

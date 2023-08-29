@@ -20,8 +20,13 @@ class ReviewAddResource(Resource):
 
         data = request.form
         
-        
-
+        check_list = ['content', 'rating', 'storeName', 'storeAddr' ,'storeLat', 'storeLng']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error': '필수 항목이 존재하지 않습니다.'
+                }, 400
             # body  = [form-data]{
             #     'image' : 이미지,
             #     'content' : '내용',
@@ -30,15 +35,19 @@ class ReviewAddResource(Resource):
             #     'tags' : [
             #         '#태그', '태그3'
             #     ],
-            #     'ratings' : [
-            #         '짠맛' : 5,
-            #         '단맛' : 3
-            #     ],
+            #     'ratings' : 5,
         storeName = data.get('storeName')
+        storeAddr = data.get('storeAddr')
         storeLat = data.get('storeLat')
         storeLng = data.get('storeLng')
         content = data.get('content')
         rating = data.get('rating')
+        
+        # 별점 유효성 검사
+        if rating > 5:
+            rating = 5
+        elif rating < 0:
+            rating = 0
             
         try:
             connection = get_connection()
@@ -59,10 +68,10 @@ class ReviewAddResource(Resource):
             if len(result_list) == 0:
                 # 가게 정보 작성하기
                 query ='''insert into store
-                        (name, lat, lng)
+                        (name,addr, lat, lng)
                         values
                         (%s, %s, %s);'''
-                record = (storeName, storeLat, storeLng)
+                record = (storeName, storeAddr ,storeLat, storeLng)
                 cursor = connection.cursor()
                 cursor.execute(query, record)
                 result_list.append({
@@ -114,7 +123,7 @@ class ReviewAddResource(Resource):
             
             
             if 'tag' in data:
-                tags = data.getlist('tag')
+                tags = data.get('tag').split('#')
                 for tag in tags:
             # 태그 API
             # 태그 중복 확인
@@ -217,6 +226,26 @@ class ReviewResource(Resource):
         
         try:
             connection = get_connection()
+            
+            
+            query = '''
+                    select *
+                    from review
+                    where id  = %s and userId = %s;
+                '''   
+                                     
+            record = (storeId, userId)
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+            result = cursor.fetchall()
+            
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '삭제할 리뷰가 없습니다.'
+                }, 400
+            
+            
             query = '''delete from review
                     where id  = %s
                     and userId = %s;'''   
@@ -236,7 +265,9 @@ class ReviewResource(Resource):
                 'error' : str(e)
             }, 500
         
-        return
+        return {
+            'result' : 'success'
+        }
     
     # 리뷰 상세보기
     @jwt_required()
