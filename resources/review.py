@@ -162,8 +162,9 @@ class ReviewAddResource(Resource):
         
         return{'result':'success'}
     
-# 리뷰 수정 
+# 특정 리뷰 관련 
 class ReviewResource(Resource):
+    # 리뷰 수정
     @jwt_required()
     def put(self, reviewId):
         
@@ -208,6 +209,7 @@ class ReviewResource(Resource):
         
         return{'result':'success'}
 
+    # 리뷰 삭제
     @jwt_required()
     def delete(self, storeId):
         
@@ -236,6 +238,7 @@ class ReviewResource(Resource):
         
         return
     
+    # 리뷰 상세보기
     @jwt_required()
     def get(self, reviewId):
         
@@ -347,28 +350,30 @@ class ReviewListResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select r.*, u.nickname, ifnull(u.profileUrl, '') profile, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng
-                    ,rp.photoURL photo, count(rc.id) commentCnt, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLike, s.dis
-                from (select *, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
+                select re.*, count(rc.id) commentCnt
+                from (select r.*, u.nickname, ifnull(u.profileUrl, '') profile, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng
+                        ,rp.photoURL photo, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLike, s.distance
+                    from (select *, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
-                    -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
-                from store) s
-                    join review r
-                    on s.id = r.storeId
-                    join user u 
-                    on u.id = r.userId
-                    left join review_photo rp
-                    on r.id = rp.reviewId
+                        -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
+                    from store) s
+                        join review r
+                        on s.id = r.storeId
+                        join user u 
+                        on u.id = r.userId
+                        left join review_photo rp
+                        on r.id = rp.reviewId
+                        left join review_likes rl
+                        on rl.reviewId = r.id
+                        left join review_likes rl_my
+                        on rl_my.reviewId = r.id and rl_my.userId = %s
+                    where distance < %s
+                    group by r.id
+                    order by distance asc
+                    limit {offset}, {limit}) re
                     left join review_comment rc
-                    on rc.reviewId = r.id
-                    left join review_likes rl
-                    on rl.reviewId = r.id
-                    left join review_likes rl_my
-                    on rl_my.reviewId = r.id and rl_my.userId = %s
-                where s.distance < %s
-                group by r.id
-                order by dis asc
-                limit {offset}, {limit};
+                    on rc.reviewId = re.id
+                group by re.id;
             '''
             record = (userId, dis)
             
