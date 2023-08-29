@@ -44,9 +44,9 @@ class MeetingCreateResource(Resource):
         content = data.get('content')
         date = data.get('date')
         maximum = data.get('maximum')
+        pay = data.get('pay')
         
-        
-       
+
         try:
             file_name = ''
             
@@ -105,11 +105,11 @@ class MeetingCreateResource(Resource):
             # 모임 등록
             query = '''
                 insert into meeting
-                (userId, storeId, content, date, maximum, photoURL)
+                (userId, storeId, content, date, maximum, photoURL, pay)
                 values
-                (%s, %s, %s ,%s, %s, %s);
+                (%s, %s, %s ,%s, %s, %s, %s);
             '''
-            record = (userId, result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name)
+            record = (userId, result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, 0 if pay == None else pay)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -147,7 +147,7 @@ class MeetingResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.createdAt, m.updatedAt, 
+                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.pay, m.createdAt, m.updatedAt, 
                     u.nickname, u.profileURL as profile, s.id as storeId, s.name as storeName, 
                     s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend, , if(m.userId = {userId}, 1, 0) isMine
                 from meeting m
@@ -230,7 +230,8 @@ class MeetingResource(Resource):
         content = data.get('content')
         date = data.get('date')
         maximum = data.get('maximum')
- 
+        pay = data.get('pay')
+        
         try:
             file_name = ''
             
@@ -307,10 +308,10 @@ class MeetingResource(Resource):
             # 모임 수정
             query = '''
                 update meeting
-                set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s
+                set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s, pay = %s
                 where userId = %s and id = %s;
             '''
-            record = (result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, userId, meetingId)
+            record = (result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, 0 if pay == None else pay ,userId, meetingId)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -535,7 +536,7 @@ class MeetingGetAllResource(Resource):
             
             # 설정한 거리안의 정보들을 불러옴
             query = f'''
-                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.createdAt, m.updatedAt
+                select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum,m.pay, m.createdAt, m.updatedAt
                 , s.name as 'storeName', s.lat as 'storeLat', s.lng as 'storeLng',truncate(s.distance, 2) as distance, count(ma.userId) attend
                 from (select id, name,lat, lng, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 

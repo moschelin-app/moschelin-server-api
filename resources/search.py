@@ -496,7 +496,8 @@ class SearchDetailMeetingResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select m.*, u.profileURL as profile, count(ma.meetingId) as attend
+                select m.id, m.userId, m.storeId, m.content, m.date, ifnull(m.photoURL, '') photo, m.maximum, m.pay, m.createdAt, m.updatedAt
+                    , u.profileURL as profile, count(ma.meetingId) as attend
                 from meeting m
                     join user u
                     on m.userId = u.id
