@@ -44,9 +44,13 @@ class ReviewAddResource(Resource):
         rating = data.get('rating')
         
         # 별점 유효성 검사
-        if rating > 5:
-            rating = 5
-        elif rating < 0:
+        if rating.isdigit():
+            rating = int(rating)
+            if rating > 5:
+                rating = 5
+            elif rating < 0:
+                rating = 0
+        else :
             rating = 0
             
         try:
@@ -70,7 +74,7 @@ class ReviewAddResource(Resource):
                 query ='''insert into store
                         (name,addr, lat, lng)
                         values
-                        (%s, %s, %s);'''
+                        (%s, %s, %s, %s);'''
                 record = (storeName, storeAddr ,storeLat, storeLng)
                 cursor = connection.cursor()
                 cursor.execute(query, record)
@@ -125,34 +129,35 @@ class ReviewAddResource(Resource):
             if 'tag' in data:
                 tags = data.get('tag').split('#')
                 for tag in tags:
-            # 태그 API
-            # 태그 중복 확인
-                    query = '''select * from tag
-                            where name = %s;'''
-                    record = (tag,)
-                    cursor = connection.cursor(dictionary=True)
-                    cursor.execute(query, record)
-                    result_list = cursor.fetchall()
+                    if tag != '':
+                    # 태그 API
+                    # 태그 중복 확인
+                        query = '''select * from tag
+                                where name = %s;'''
+                        record = (tag,)
+                        cursor = connection.cursor(dictionary=True)
+                        cursor.execute(query, record)
+                        result_list = cursor.fetchall()
 
-                    if len(result_list) == 0:
-                        # 태그 넣기
-                        query = '''insert into tag
-                                    (name) values (%s);'''
-                        record = (tag, )
+                        if len(result_list) == 0:
+                            # 태그 넣기
+                            query = '''insert into tag
+                                        (name) values (%s);'''
+                            record = (tag, )
+                            cursor = connection.cursor()
+                            cursor.execute(query,record)
+                            result_list.append({
+                                'id': cursor.lastrowid
+                            })
+                    
+                        # 리뷰태그 테이블의 정보 입력
+                        query = '''insert into review_tag
+                                    (reviewId, tagId)
+                                    values
+                                    (%s, %s);'''
+                        record = (reviewId, result_list[0]['id'])
                         cursor = connection.cursor()
-                        cursor.execute(query,record)
-                        result_list.append({
-                            'id': cursor.lastrowid
-                        })
-                
-                    # 리뷰태그 테이블의 정보 입력
-                    query = '''insert into review_tag
-                                (reviewId, tagId)
-                                values
-                                (%s, %s);'''
-                    record = (reviewId, result_list[0]['id'])
-                    cursor = connection.cursor()
-                    cursor.execute(query,record) 
+                        cursor.execute(query,record) 
             
             connection.commit()
             
@@ -180,29 +185,172 @@ class ReviewResource(Resource):
         userId = get_jwt_identity()
 
         data = request.form
+        
+        check_list = ['content', 'rating', 'storeName', 'storeAddr' ,'storeLat', 'storeLng']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error': '필수 항목이 존재하지 않습니다.'
+                }, 400
 
-            # body  = [form-data]{
-            #     'image' : 이미지,
-            #     'content' : '내용',
-            #     'storeName' : '가게이름',
-            #     'storeAddress' : '가게주소',
-            #     'tags' : [
-            #         '#태그', '태그3'
-            #     ],
-            #     'ratings' : [
-            #         '짠맛' : 5,
-            #         '단맛' : 3
-            #     ],
+        storeName = data.get('storeName')
+        storeAddr = data.get('storeAddr')
+        storeLat = data.get('storeLat')
+        storeLng = data.get('storeLng')
+        content = data.get('content')
+        rating = data.get('rating')
+        
+        # 별점 유효성 검사
+        if rating.isdigit():
+            rating = int(rating)
+            if rating > 5:
+                rating = 5
+            elif rating < 0:
+                rating = 0
+        else :
+            rating = 0
+            
 
         try:
             connection = get_connection()
-            query = '''update review
-                    set content = %s
-                    where id = %s;'''   
+            
+            # 수정할 리뷰가 있는지 확인
+            query = '''
+                    select *
+                    from review
+                    where id = %s and userId = %s;'''   
                                      
-            record = (data['content'], reviewId)
+            record = (reviewId, userId)
             cursor = connection.cursor()
             cursor.execute(query,record)
+            result = cursor.fetchall()
+            
+            if len(result) == 0:
+                return {
+                    'result' : 'fail',
+                    'error' : '삭제할 리뷰가 없습니다.'
+                }, 402
+                
+            # 가게정보 API
+            # 가게정보 확인하기
+            query = '''select id from store
+                    where name = %s
+                    and lat = %s
+                    and lng = %s;'''
+            record = (storeName, storeLat, storeLng)
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query,record)                                
+            result_list = cursor.fetchall()
+            # print('받아온 데이터 : ')
+            # print(result_list)
+            
+            if len(result_list) == 0:
+                # 가게 정보 작성하기
+                query ='''insert into store
+                        (name,addr, lat, lng)
+                        values
+                        (%s, %s, %s, %s);'''
+                record = (storeName, storeAddr ,storeLat, storeLng)
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+                result_list.append({
+                    'id' : cursor.lastrowid
+                    })
+            
+            # 리뷰 본문 수정
+            query = '''
+                    update review
+                    set content = %s, rating = %s, storeId = %s
+                    where id = %s and userId = %s;'''   
+                                     
+            record = (content, rating, result_list[0]['id'], reviewId, userId)
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+            
+            # 리뷰 사진 기본적으로 전부 삭제시키고
+            query = '''
+                    delete from review_photo
+                    where reviewId = %s;
+                    '''                   
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+            
+            # 있다면 새로 넣자.
+            if 'photo' in request.files:
+                for photo in request.files.getlist('photo'):
+                    # 이미지 파일 업로드를 위한 코드                
+                    # print(current_time.isoformat().replace(':', '_').replace('.', '_') + '.jpg')
+                    new_filename = create_file_name()
+            
+                    s3 = boto3.client(
+                        's3',
+                        aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                        aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY, 
+                        # region_name = Config.AWS_S3_REGION_NAME
+                    )
+                    s3.upload_fileobj(
+                        photo,
+                        Config.S3_BUCKET,
+                        new_filename,
+                        ExtraArgs = {
+                            'ACL' : 'public-read',
+                            'ContentType' : 'image/jpeg'
+                        }
+                    )
+                    
+                    query = '''insert into review_photo
+                            (reviewId, photoURL)
+                            values
+                            (%s, %s);'''
+                    record = (reviewId, Config.S3_Base_URL+new_filename)
+                    cursor = connection.cursor()
+                    cursor.execute(query, record)
+            
+            # 있는 태그를 전부 삭제 후
+            query = '''
+                    delete from review_tag
+                    where reviewId = %s;
+                    '''                   
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+            
+            # 태그가 존재하면 추가하자.
+            if 'tag' in data:
+                tags = data.get('tag').split('#')
+                for tag in tags:
+                    if tag != '':
+                        # 태그 API
+                        # 태그 중복 확인
+                        query = '''select * from tag
+                                where name = %s;'''
+                        record = (tag,)
+                        cursor = connection.cursor(dictionary=True)
+                        cursor.execute(query, record)
+                        result_list = cursor.fetchall()
+
+                        if len(result_list) == 0:
+                            # 태그 넣기
+                            query = '''insert into tag
+                                        (name) values (%s);'''
+                            record = (tag, )
+                            cursor = connection.cursor()
+                            cursor.execute(query,record)
+                            result_list.append({
+                                'id': cursor.lastrowid
+                            })
+                    
+                        # 리뷰태그 테이블의 정보 입력
+                        query = '''insert into review_tag
+                                    (reviewId, tagId)
+                                    values
+                                    (%s, %s);'''
+                        record = (reviewId, result_list[0]['id'])
+                        cursor = connection.cursor()
+                        cursor.execute(query,record) 
+            
             
             connection.commit()
             
