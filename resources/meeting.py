@@ -537,7 +537,7 @@ class MeetingGetAllResource(Resource):
             # 설정한 거리안의 정보들을 불러옴
             query = f'''
                 select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum,m.pay, m.createdAt, m.updatedAt
-                , s.name as 'storeName', s.lat as 'storeLat', s.lng as 'storeLng',truncate(s.distance, 2) as distance, count(ma.userId) attend
+                , s.name as 'storeName', s.addr as 'storeAddr', s.lat as 'storeLat', s.lng as 'storeLng',s.distance, count(ma.userId) attend
                 from (select id, name,lat, lng, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
                     -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance

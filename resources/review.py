@@ -248,25 +248,30 @@ class ReviewResource(Resource):
         try:
             connection = get_connection()
             query = '''
-                select r.*, s.id as storeId, s.name storeName,s.lat as storeLat, s.lng storeLng,
-                count(rl.reviewId) as 'likes', count(rc.reviewId) as 'commentCnt', 
-                count(rl_my.userId) as 'isLike'
-                from review r
-                    join store s
-                    on r.storeId = s.id
-                    left join review_likes rl
-                    on rl.reviewId = r.id
+                select re.*, count(rc.reviewId) as 'commentCnt'
+                from (select r.*, s.name storeName,s.lat as storeLat, s.lng storeLng, s.addr storeAddr,
+                    count(rl.reviewId) as 'likeCnt', if(rl_my.userId, 1, 0) isLike
+                    from review r
+                        join store s
+                        on r.storeId = s.id
+                        left join review_likes rl
+                        on rl.reviewId = r.id
+                        left join review_likes rl_my
+                        on rl_my.reviewId = r.id and rl_my.userId = %s
+                    where r.id = %s) re
                     left join review_comment rc
-                    on rc.reviewId = r.id
-                    left join review_likes rl_my
-                    on rl_my.userId = %s
-                where r.id = %s;
+                    on rc.reviewId = re.id;
                 '''
             record = (userId, reviewId)
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query,record)
             result_review = cursor.fetchone()
-            # print(result)           
+ 
+            if result_review['id'] == None:
+                return {
+                    'result' : 'fail',
+                    'error' : '게시물을 찾을 수 없습니다.'
+                }, 400       
             
             query = '''
                 select photoURL as photo
@@ -315,10 +320,11 @@ class ReviewResource(Resource):
         # 소수점 포멧
         # result_review['storeLat'] = float(result_review['storeLat'])
         # result_review['storeLng'] = float(result_review['storeLng'])
-
+        result_review = decimal_formatting(date_formatting(result_review))
+        result_review['rating'] = int( result_review['rating'])
 
         return ({'result':'success',
-                'item':decimal_formatting(date_formatting(result_review))
+                'item': result_review
         })
     
 
