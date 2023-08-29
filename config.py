@@ -14,7 +14,7 @@ class Config:
     
     AWS_ACCESS_KEY_ID = 'AKIAR4D3TFNFFIUUJ56P'
     AWS_SECRET_ACCESS_KEY = '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'
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=720)
     
     S3_BUCKET = 'aws-moschelin-s3'
     S3_Base_URL = f'https://{S3_BUCKET}.s3.amazonaws.com/'
