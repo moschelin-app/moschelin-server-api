@@ -348,7 +348,7 @@ class ReviewListResource(Resource):
             
             query = f'''
                 select r.*, u.nickname, ifnull(u.profileUrl, '') profile, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng
-                    ,rp.photoURL photo, count(rc.id) commecntCnt, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLIke, s.dis
+                    ,rp.photoURL photo, count(rc.id) commentCnt, count(rl.reviewId) likeCnt, if(rl_my.userId, 1, 0) isLike, s.dis
                 from (select *, (6371*acos(cos(radians(lat))*cos(radians({lat}))*cos(radians({lng})
 
                     -radians(lng))+sin(radians(lat))*sin(radians({lat})))) as distance
