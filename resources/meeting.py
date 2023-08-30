@@ -235,32 +235,9 @@ class MeetingResource(Resource):
         maximum = data.get('maximum')
         pay = data.get('pay')
         
-        try:
-            file_name = ''
-            
+        try:         
             connection = get_connection()
-            
-            if 'photo' in request.files:
-                file_name = create_file_name()
-                
-                s3 = boto3.client(
-                    's3',
-                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY
-                )
-                
-                # 파일 업로드
-                s3.upload_fileobj(
-                    request.files['photo'],
-                    Config.S3_BUCKET,
-                    file_name,
-                    ExtraArgs = {
-                        'ACL' : 'public-read', # 모든 사람들이 사진을 볼수 있어야함. 권한 설정
-                        'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
-                    }
-                )
-                
- 
+
             # 등록된 모임이 있는지 확인
             query = '''
                 select * 
@@ -305,19 +282,51 @@ class MeetingResource(Resource):
                 result = {
                     'id' : cursor.lastrowid
                 }
-                
-                
-                
-            # 모임 수정
-            query = '''
-                update meeting
-                set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s, pay = %s
-                where userId = %s and id = %s;
-            '''
-            record = (result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, 0 if pay == None else pay ,userId, meetingId)
             
-            cursor = connection.cursor()
-            cursor.execute(query, record)
+            if 'photo' in request.files:
+                file_name = create_file_name()
+                
+                s3 = boto3.client(
+                    's3',
+                    aws_access_key_id = Config.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key = Config.AWS_SECRET_ACCESS_KEY
+                )
+                
+                # 파일 업로드
+                s3.upload_fileobj(
+                    request.files['photo'],
+                    Config.S3_BUCKET,
+                    file_name,
+                    ExtraArgs = {
+                        'ACL' : 'public-read', # 모든 사람들이 사진을 볼수 있어야함. 권한 설정
+                        'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
+                    }
+                )
+                # 모임 수정
+                query = '''
+                    update meeting
+                    set storeId = %s, content = %s, date = %s, maximum = %s, photoURL = %s, pay = %s
+                    where userId = %s and id = %s;
+                '''
+                record = (result['id'], content, date, maximum, None if file_name == '' else Config.S3_Base_URL + file_name, 0 if pay == None else pay ,userId, meetingId)
+                
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+                
+            else :
+                
+                # 모임 수정
+                query = '''
+                    update meeting
+                    set storeId = %s, content = %s, date = %s, maximum = %s, pay = %s
+                    where userId = %s and id = %s;
+                '''
+                record = (result['id'], content, date, maximum, 0 if pay == None else pay ,userId, meetingId)
+                
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+                
+                
             connection.commit()
             
             cursor.close()

@@ -268,17 +268,17 @@ class ReviewResource(Resource):
             cursor = connection.cursor()
             cursor.execute(query,record)
             
-            # 리뷰 사진 기본적으로 전부 삭제시키고
-            query = '''
-                    delete from review_photo
-                    where reviewId = %s;
-                    '''                   
-            record = (reviewId, )
-            cursor = connection.cursor()
-            cursor.execute(query,record)
-            
             # 있다면 새로 넣자.
             if 'photo' in request.files:
+                # 리뷰 사진 기본적으로 전부 삭제시키고
+                query = '''
+                        delete from review_photo
+                        where reviewId = %s;
+                        '''                   
+                record = (reviewId, )
+                cursor = connection.cursor()
+                cursor.execute(query,record)
+                
                 for photo in request.files.getlist('photo'):
                     # 이미지 파일 업로드를 위한 코드                
                     # print(current_time.isoformat().replace(':', '_').replace('.', '_') + '.jpg')
