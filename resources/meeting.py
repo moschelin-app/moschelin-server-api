@@ -149,7 +149,7 @@ class MeetingResource(Resource):
             query = f'''
                 select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.pay, m.createdAt, m.updatedAt, 
                     u.nickname, u.profileURL as profile, s.id as storeId, s.name as storeName, 
-                    s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend, , if(m.userId = {userId}, 1, 0) isMine
+                    s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend, if(m.userId = {userId}, 1, 0) isMine
                 from meeting m
                     join user u
                     on m.userId = u.id
