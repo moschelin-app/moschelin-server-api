@@ -230,15 +230,28 @@ class UserInfoEditResource(Resource):
                         'ContentType' : 'image/jpeg' # 올리는 모든 이미지의 타입을 jpg로 설정
                     }
                 )
-            # 수정
-            query = '''
-                update user
-                set email = %s, nickname = %s, name = %s, profileURL = %s
-                where id = %s;
-            '''
-            record = (email, nickname, name, None if file_name == '' else Config.S3_Base_URL + file_name, userId)
-            cursor = connection.cursor()
-            cursor.execute(query, record)
+                
+                # 수정
+                query = '''
+                    update user
+                    set email = %s, nickname = %s, name = %s, profileURL = %s
+                    where id = %s;
+                '''
+                record = (email, nickname, name, None if file_name == '' else Config.S3_Base_URL + file_name, userId)
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+                
+            else :
+                
+                # 수정
+                query = '''
+                    update user
+                    set email = %s, nickname = %s, name = %s
+                    where id = %s;
+                '''
+                record = (email, nickname, name, userId)
+                cursor = connection.cursor()
+                cursor.execute(query, record)
             
             # 비밀번호 변경
             if 'password' in data:
