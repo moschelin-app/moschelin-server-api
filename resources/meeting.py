@@ -150,7 +150,7 @@ class MeetingResource(Resource):
                 select m.id, m.userId, m.storeId, m.content, m.date, m.photoURL as photo, m.maximum, m.pay, m.createdAt, m.updatedAt, 
                     u.nickname, u.profileURL as profile, s.name as storeName, s.addr as storeAddr,
                     s.lat as storeLat, s.lng as storeLng, count(ma.userId) as attend, if(m.userId = {userId}, 1, 0) isMine,
-                    if(ma.userId = {userId}, 1, 0) isAttend
+                    if(ma_my.userId, 1, 0) isAttend
                 from meeting m
                     join user u
                     on m.userId = u.id
@@ -158,6 +158,8 @@ class MeetingResource(Resource):
                     on m.storeId = s.id
                     left join meeting_attend ma
                     on m.id = ma.meetingid
+                    left join meeting_attend ma_my
+                    on m.id = ma.meetingid and ma_my.userId = {userId}
                 where m.id = %s
                 group by m.id;
             '''
