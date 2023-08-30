@@ -159,7 +159,7 @@ class MeetingResource(Resource):
                     left join meeting_attend ma
                     on m.id = ma.meetingid
                     left join meeting_attend ma_my
-                    on m.id = ma.meetingid and ma_my.userId = {userId}
+                    on m.id = ma_my.meetingid and ma_my.userId = {userId}
                 where m.id = %s
                 group by m.id;
             '''
