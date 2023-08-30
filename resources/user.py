@@ -353,7 +353,40 @@ class UserInfoResource(Resource):
             'result' : 'success',
             'item' : date_formatting(result)
         }
+
+# 내 정보 확인
+class UserMyInfoResource(Resource):
+    @jwt_required()
+    def get(self):
         
+        userId = get_jwt_identity()
+        
+        try:
+            connection = get_connection()
+            
+            query = '''
+                select id, email, nickname, name, profileURL profile, createdAt, updatedAt, if(id = %s, 1,0) isMine
+                from user 
+                where id = %s;
+            '''
+            record = (userId, userId)
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result = cursor.fetchone()
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+        
+        return {
+            'result' : 'success',
+            'item' : date_formatting(result)
+        }        
         
 # 유저 정보에서 유저가 작성한 리뷰 가져오기   
 class UserInfoReviewResource(Resource):
