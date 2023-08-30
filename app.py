@@ -4,7 +4,7 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from config import Config
 
-from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserEmailFindResource, UserInfoResource, UserInfoReviewResource, UserInfoLikesResource, UserInfoEditResource, UserMyInfoResource
+from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserInfoResource, UserInfoReviewResource, UserInfoLikesResource, UserInfoEditResource, UserMyInfoResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
 from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource, SearchPlaceResource
 from resources.review import ReviewAddResource, ReviewResource, ReviewListResource
@@ -28,8 +28,6 @@ api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
 # 유저 정보 수정
 api.add_resource(UserInfoEditResource, '/user/edit')
-# 유저 이메일 찾기
-api.add_resource(UserEmailFindResource, '/user/find/email')
 # 유저 내 정보 보기
 api.add_resource(UserMyInfoResource, '/user/my_page')
 # 유저 정보 보기

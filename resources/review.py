@@ -229,7 +229,7 @@ class ReviewResource(Resource):
             if len(result) == 0:
                 return {
                     'result' : 'fail',
-                    'error' : '삭제할 리뷰가 없습니다.'
+                    'error' : '수정할 리뷰가 없습니다.'
                 }, 402
                 
             # 가게정보 API
@@ -426,6 +426,17 @@ class ReviewResource(Resource):
       
         try:
             connection = get_connection()
+            
+            query = '''
+                update review
+                set view =  1 + view
+                where id = %s;
+                '''
+            record = (reviewId, )
+            cursor = connection.cursor()
+            cursor.execute(query,record)
+            
+
             query = '''
                 select re.*, count(rc.reviewId) as 'commentCnt'
                 from (select r.*, s.name storeName,s.lat as storeLat, s.lng storeLng, s.addr storeAddr,
@@ -475,7 +486,7 @@ class ReviewResource(Resource):
             cursor.execute(query, record)
             result_review['tags'] = cursor.fetchall()
             
-            # connection.commit() # <- 생성, 수정, 삭제시에만 사용하는 코드 commit()을 사용한다.
+            connection.commit() # <- 생성, 수정, 삭제시에만 사용하는 코드 commit()을 사용한다.
                     
             
             cursor.close()

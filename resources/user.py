@@ -174,47 +174,6 @@ class UserLogoutResource(Resource):
             'result' : 'success'
         }
     
-    
-# 유저 이메일 찾기
-class UserEmailFindResource(Resource):
-    def post(self):
-
-        data = request.get_json()
-
-        try:
-            connection = get_connection()
-
-            query = '''
-                select email
-                from user
-                where name = %s and nickname = %s;
-            '''
-            record = (data['name'], data['nickname'])
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(query, record)
-            result = cursor.fetchall()
-
-            if len(result) == 0:
-                return {
-                    'result' : 'fail',
-                    'error' : '찾는 이메일이 없습니다.'
-                }, 400
-
-            cursor.close()
-            connection.close()
-
-        except Error as e:
-            return {
-                'result' : 'fail',
-                'error' : str(e)
-            }, 500
-
-
-        
-        return {
-            'result' : 'success',
-            'email' : result[0]['email']
-        }
 
 # 유저 정보 수정
 class UserInfoEditResource(Resource):
