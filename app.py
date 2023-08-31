@@ -12,6 +12,7 @@ from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
 from resources.maps import MapsGetStoreResource, MapGetReviewResource
 from resources.store import StoreGetMeetingResource, StoreGetReviewResource, StoreResource
+from resources.account_book import AccountBookResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -97,6 +98,9 @@ api.add_resource(StoreResource, '/store/<int:storeId>')
 api.add_resource(StoreGetReviewResource, '/store/<int:storeId>/review')
 # 가게 상세보기에서 모임 정보 보여주기
 api.add_resource(StoreGetMeetingResource, '/store/<int:storeId>/meeting')
+
+# 가계부 작성하기
+api.add_resource(AccountBookResource, '/account')
 
 if __name__ == '__main__':
     app.run()
