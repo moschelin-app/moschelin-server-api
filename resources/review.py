@@ -439,9 +439,11 @@ class ReviewResource(Resource):
 
             query = '''
                 select re.*, count(rc.reviewId) as 'commentCnt'
-                from (select r.*, s.name storeName,s.lat as storeLat, s.lng storeLng, s.addr storeAddr,
+                from (select r.*,ifnull(u.profileURL, '') profile, u.nickname , s.name storeName,s.lat as storeLat, s.lng storeLng, s.addr storeAddr,
                     count(rl.reviewId) as 'likeCnt', if(rl_my.userId, 1, 0) isLike
                     from review r
+                        join user u
+                        on r.userId = u.id
                         join store s
                         on r.storeId = s.id
                         left join review_likes rl
