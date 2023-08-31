@@ -69,3 +69,7 @@ def get_google_next_token(token):
     place_list = places.places_nearby(client=gmaps, language='ko', page_token=token)
  
     return place_format(place_list) 
+
+
+def get_random_login_code():
+    return datetime.now().isoformat().replace(':','').replace('.', '')

@@ -4,7 +4,7 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from config import Config
 
-from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserInfoResource, UserInfoReviewResource, UserInfoLikesResource, UserInfoEditResource, UserMyInfoResource
+from resources.user import jwt_blocklist, UserRegisterResource, UserLoginResource, UserLogoutResource, UserInfoResource, UserInfoReviewResource, UserInfoLikesResource, UserInfoEditResource, UserMyInfoResource, UserKakaoLoginResource
 from resources.meeting import MeetingCreateResource, MeetingGetAllResource, MeetingResource, MeetingAttendResource
 from resources.search import SearchResentDeleteResource, SearchResource, SearchResentResource, SearchRelationResource, SearchDetailMeetingResource, SearchDetailReviewResource, SearchDetailStoreResource, SearchDetailUserResource, SearchPlaceResource
 from resources.review import ReviewAddResource, ReviewResource, ReviewListResource
@@ -22,6 +22,9 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     return jti in jwt_blocklist
 
 api = Api(app)
+
+# 카카오 로그인
+api.add_resource(UserKakaoLoginResource, '/user/kakao/login')
 
 api.add_resource(UserRegisterResource, '/user/register')
 api.add_resource(UserLoginResource, '/user/login')

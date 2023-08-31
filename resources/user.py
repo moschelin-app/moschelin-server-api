@@ -7,7 +7,7 @@ from mysql.connector import Error
 from mysql_connection import get_connection
 
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
-from utils import date_formatting, create_file_name
+from utils import date_formatting, create_file_name, get_random_login_code
 from config import Config
 
 import boto3
@@ -125,7 +125,7 @@ class UserLoginResource(Resource):
             query = '''
                 select * 
                 from user
-                where email = %s;
+                where email = %s and provider = 'email';
             '''
             record = (data['email'], )
             
@@ -469,6 +469,73 @@ class UserInfoLikesResource(Resource):
             'count' : len(result_list),
             'items' : result_list
         } 
-             
+
+
+# 카카오 로그인
+class UserKakaoLoginResource(Resource):
+    def post(self):
+        
+        data = request.get_json()
+        
+        check_list = ['kakaoId', 'email', 'name', 'profile']
+        for check in check_list:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목을 확인하세요.'
+                }, 400
+                
+        try:
+            connection = get_connection()
+            
+            query = '''
+                select *
+                from user
+                where provider = 'kakao'
+                    and providerId = %s
+                    and email = %s;
+            '''
+            record = (data['kakaoId'], data['email'])
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result = cursor.fetchone()
+            
+            if result == None:
+                
+                name = f"{data['name']}_get_random_login_code()"
+                
+                query = '''
+                    insert into user
+                    (email, nickname, name, profileURL, provider, providerId)
+                    values
+                    (%s, %s, %s, %s,'kakao', %s);
+                '''
+                record = (data['email'], name, name, data['profile'], data['kakaoId'])
+                cursor = connection.cursor()
+                cursor.execute(query, record)
+                
+                result = {
+                    'id' : cursor.lastrowid
+                }         
+                
+                connection.commit()       
+                
+            
+            cursor.close()
+            connection.close()
+            
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+            
+        accessToken = create_access_token(result['id'])
+        
+        return {
+            'result' : 'success',
+            'accessToken' : accessToken
+        }
         
         
