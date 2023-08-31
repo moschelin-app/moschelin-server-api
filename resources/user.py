@@ -502,7 +502,7 @@ class UserKakaoLoginResource(Resource):
             
             if result == None:
                 
-                name = f"{data['name']}_get_random_login_code()"
+                name = f"{data['name']}_{get_random_login_code()}"
                 
                 query = '''
                     insert into user
