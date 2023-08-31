@@ -24,7 +24,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 api = Api(app)
 
 # 카카오 로그인
-api.add_resource(UserKakaoLoginResource, '/user/kakao/login')
+api.add_resource(UserKakaoLoginResource, '/user/login/kakao')
 
 api.add_resource(UserRegisterResource, '/user/register')
 api.add_resource(UserLoginResource, '/user/login')
