@@ -2,6 +2,7 @@ from passlib.hash import pbkdf2_sha256
 from datetime import datetime
 from config import Config
 from googlemaps import Client, places
+import requests
 
 def create_hash_passwrod(new_password):
     hash_password = pbkdf2_sha256.hash(new_password + Config.SALT)
@@ -31,7 +32,7 @@ def decimal_formatting(data):
     
     date_list = ['rating', 'storeLat', 'storeLng', 'distance']
     for date in date_list:
-        if date in data:
+        if date in data  and data[date] != None:
             data[date] = float(data[date])
     
     return data
@@ -60,6 +61,8 @@ def get_google_place(lat, lng, keyword):
     
     place_list = places.places_nearby(client=gmaps, location=(lat ,lng), 
                                       radius=1500, keyword=keyword, language='ko')
+    
+    print(place_list)
 
     return place_format(place_list)
 
@@ -73,3 +76,37 @@ def get_google_next_token(token):
 
 def get_random_login_code():
     return datetime.now().isoformat().replace(':','').replace('.', '')
+
+def get_store_clova(review_content, max_summary = 1):
+    
+    url = 'https://naveropenapi.apigw.ntruss.com/text-summary/v1/summarize'
+
+    header = {
+        'X-NCP-APIGW-API-KEY-ID' : Config.NAVER_CLIENT_KEY,
+        'X-NCP-APIGW-API-KEY' : Config.NAVER_SECRET_KEY,
+        'Content-Type' : 'application/json'
+    }
+
+    body = {
+        'document' : {
+            'content' : review_content[:2000]
+        },
+        'option' : {
+            "language": "ko",
+            "summaryCount": max_summary
+        } 
+    }
+    
+    try:
+        
+        res = requests.post(
+            url= url,
+            headers=header,
+            json=body
+        )
+ 
+        summary = res.json()['summary']
+    except Exception:
+        summary = ''
+
+    return summary

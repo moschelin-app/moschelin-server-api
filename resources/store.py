@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from mysql_connection import get_connection
 from mysql.connector import Error
 
-from utils import date_formatting, decimal_formatting
+from utils import date_formatting, decimal_formatting, get_store_clova
 
 # 가게 정보 불러오기
 class StoreResource(Resource):
@@ -28,17 +28,36 @@ class StoreResource(Resource):
             cursor.execute(query, record)
             result = cursor.fetchone()
             
+            
+            query = '''
+                select content
+                from review
+                where storeId = %s;
+            '''
+            record = (storeId, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            review_list = cursor.fetchall()            
+            
+            
             cursor.close()
             connection.close()
             
         except Error as e:
             return {
-                'result' :'success',
+                'result' :'fail',
                 'error' : str(e)
             }, 500
             
-            
         
+        result['summary'] = ''
+        
+        for review in review_list:
+            result['summary'] += review['content']
+        
+        if result['summary'] != '':
+            result['summary'] = get_store_clova(result['summary'])
+            
         return {
             'result' : 'success',
             'item' : decimal_formatting(date_formatting(result))
@@ -125,7 +144,7 @@ class StoreGetReviewResource(Resource):
             
         except Error as e:
             return {
-                'result' :'success',
+                'result' :'fail',
                 'error' : str(e)
             }, 500
         
@@ -201,7 +220,7 @@ class StoreGetMeetingResource(Resource):
             
         except Error as e:
             return {
-                'result' :'success',
+                'result' :'fail',
                 'error' : str(e)
             }, 500
         

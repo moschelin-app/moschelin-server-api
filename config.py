@@ -20,6 +20,9 @@ class Config:
     S3_Base_URL = f'https://{S3_BUCKET}.s3.amazonaws.com/'
     
     GOOGLE_KEY = 'AIzaSyDPTSlAy52MeqFpGF3V7vcwR663Cxv02eM'
+    
+    NAVER_CLIENT_KEY = '6tyljnu16e'
+    NAVER_SECRET_KEY = '5bWK6NPdjHxa9vg684fLhPCLrQhaP1kuWbUYUUTm'
 
     
     
