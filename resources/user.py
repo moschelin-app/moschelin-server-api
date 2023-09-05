@@ -471,6 +471,62 @@ class UserInfoLikesResource(Resource):
         } 
 
 
+class UserInfoMeetingResource(Resource):
+    #@jwt_required()
+    def get(self, user_id):
+        
+        data = request.args
+        
+        check_lsit = ['offset', 'limit']
+        for check in check_lsit:
+            if check not in data:
+                return {
+                    'result' : 'fail',
+                    'error' : '필수 항목이 존재하지 않습니다.'
+                }, 400
+        
+        offset = data.get('offset')
+        limit = data.get('limit')
+        
+        
+        try:
+            connection = get_connection()
+            
+            query = f'''
+                select m.id, ifnull(m.photoURL, '') photo, m.date , m.maximum , count(ma_attend.meetingId) attend
+                from meeting_attend ma
+                    join meeting m
+                    on m.id = ma.meetingId and ma.userId = %s
+                    left join meeting_attend ma_attend
+                    on m.id = ma_attend.meetingId
+                group by m.id having m.date > now()
+                order by m.date
+                limit {offset}, {limit};
+            '''
+            record = (user_id, )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+            result_list = cursor.fetchall()
+            
+            for i in range(len(result_list)):
+                result_list[i] = date_formatting(result_list[i])
+            
+            cursor.close()
+            connection.close()
+            
+        except Error as e:
+            return {
+                'result' : 'fail',
+                'error' : str(e)
+            }, 500
+        
+        
+        return {
+            'result' : 'success',
+            'count' : len(result_list),
+            'items' : result_list
+        } 
+
 # 카카오 로그인
 class UserKakaoLoginResource(Resource):
     def post(self):
