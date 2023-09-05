@@ -208,7 +208,7 @@ class ReviewCommentModResource(Resource):
                 }, 402
             
             
-            query = '''delete drom review_comment
+            query = '''delete from review_comment
                     where id = %s
                     and userId = %s'''
             record = (commentId, userId)
