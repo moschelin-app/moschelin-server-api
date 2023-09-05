@@ -472,7 +472,7 @@ class UserInfoLikesResource(Resource):
 
 
 class UserInfoMeetingResource(Resource):
-    #@jwt_required()
+    @jwt_required()
     def get(self, user_id):
         
         data = request.args
