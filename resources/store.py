@@ -17,7 +17,7 @@ class StoreResource(Resource):
             
             # 평균 별점과 같이 들고온다.
             query = '''
-                select s.id storeId, s.name storeName,s.addr storeAddr, s.lat storeLat, s.lng storeLng, avg(r.rating) as rating
+                select s.id storeId, ifnull(s.photoURL, '') as storePhoto, s.name storeName,s.addr storeAddr, s.lat storeLat, s.lng storeLng, avg(r.rating) as rating
                 from store s
                     join review r
                     on s.id = r.storeId
