@@ -23,6 +23,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     return jti in jwt_blocklist
 
 api = Api(app)
+#
 
 # 카카오 로그인
 api.add_resource(UserKakaoLoginResource, '/user/login/kakao')
