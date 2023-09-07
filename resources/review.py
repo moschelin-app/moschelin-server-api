@@ -368,7 +368,7 @@ class ReviewResource(Resource):
 
     # 리뷰 삭제
     @jwt_required()
-    def delete(self, storeId):
+    def delete(self, reviewId):
         
         userId = get_jwt_identity()
         
@@ -382,7 +382,7 @@ class ReviewResource(Resource):
                     where id  = %s and userId = %s;
                 '''   
                                      
-            record = (storeId, userId)
+            record = (reviewId, userId)
             cursor = connection.cursor()
             cursor.execute(query,record)
             result = cursor.fetchall()
@@ -398,7 +398,7 @@ class ReviewResource(Resource):
                     where id  = %s
                     and userId = %s;'''   
                                      
-            record = (storeId, userId)
+            record = (reviewId, userId)
             cursor = connection.cursor()
             cursor.execute(query,record)
             
