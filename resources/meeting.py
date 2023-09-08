@@ -7,7 +7,7 @@ from mysql_connection import get_connection
 from mysql.connector import Error
 
 from config import Config
-from utils import create_file_name, date_formatting
+from utils import create_file_name, date_formatting, decimal_formatting
 
 import boto3
 
@@ -583,13 +583,7 @@ class MeetingGetAllResource(Resource):
                 profiles = cursor.fetchall()
                 result_list[i]['profiles'] = profiles
                 # 날짜 포멧
-                result_list[i]['date'] = result_list[i]['date'].isoformat()
-                result_list[i]['createdAt'] = result_list[i]['createdAt'].isoformat()
-                result_list[i]['updatedAt'] = result_list[i]['updatedAt'].isoformat()
-                # 소수점 포멧
-                result_list[i]['distance'] = float(result_list[i]['distance'])
-                result_list[i]['storeLat'] = float(result_list[i]['storeLat'])
-                result_list[i]['storeLng'] = float(result_list[i]['storeLng'])
+                result_list[i] = decimal_formatting(date_formatting(result_list[i]))
                 i += 1
             
             cursor.close()
