@@ -39,6 +39,7 @@ class MapsGetStoreResource(Resource):
                 on s.id = r.storeId
             where s.distance < {dis} and rating > 0
             group by s.id
+            order by s.distance asc
             limit 15;
             '''
             
