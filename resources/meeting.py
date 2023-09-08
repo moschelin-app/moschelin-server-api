@@ -560,7 +560,7 @@ class MeetingGetAllResource(Resource):
                     on m.id = ma.meetingId
                 where s.distance < {dis}
                 group by m.id
-                order by s.distance asc
+                order by m.date asc
                 limit {offset}, {limit};
             '''
             
