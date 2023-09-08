@@ -12,7 +12,7 @@ from resources.comment import ReviewCommentModResource, ReviewCommentResource
 from resources.like import ReviewLikeResource
 from resources.maps import MapsGetStoreResource, MapGetReviewResource
 from resources.store import StoreGetMeetingResource, StoreGetReviewResource, StoreResource
-from resources.account_book import AccountBookResource, AccountBookMonthResource, AccountBookDetailsResource
+from resources.account_book import AccountAddBookResource, AccountBookResource, AccountBookMonthResource, AccountBookDetailsResource
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,7 +23,6 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
     return jti in jwt_blocklist
 
 api = Api(app)
-#
 
 # 카카오 로그인
 api.add_resource(UserKakaoLoginResource, '/user/login/kakao')
@@ -103,11 +102,16 @@ api.add_resource(StoreGetReviewResource, '/store/<int:storeId>/review')
 api.add_resource(StoreGetMeetingResource, '/store/<int:storeId>/meeting')
 
 # 가계부 작성하기
-api.add_resource(AccountBookResource, '/account')
+api.add_resource(AccountAddBookResource, '/account')
+# 가계부 수정 삭제하기
+api.add_resource(AccountBookResource, '/account/<int:account_bookId>')
 # 가계부 월별 리스트
 api.add_resource(AccountBookMonthResource, '/account/<int:month>')
 # 가계부 일별 상세보기
-api.add_resource(AccountBookDetailsResource, '/account/<int:day>')
+api.add_resource(AccountBookDetailsResource, '/account/day/<int:accountBooksId>')
 
 if __name__ == '__main__':
     app.run()
+    
+    
+ 
