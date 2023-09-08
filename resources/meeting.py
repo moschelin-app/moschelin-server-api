@@ -558,7 +558,7 @@ class MeetingGetAllResource(Resource):
                     on s.id = m.storeId
                     left join meeting_attend ma
                     on m.id = ma.meetingId
-                where s.distance < {dis}
+                where s.distance < {dis} and m.date > now()
                 group by m.id
                 order by m.date asc
                 limit {offset}, {limit};
