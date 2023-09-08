@@ -38,7 +38,8 @@ class MapsGetStoreResource(Resource):
                 left join review r
                 on s.id = r.storeId
             where s.distance < {dis} and rating > 0
-            group by s.id;
+            group by s.id
+            limit 15;
             '''
             
             cursor = connection.cursor(dictionary=True)
