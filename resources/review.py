@@ -567,7 +567,7 @@ class ReviewListResource(Resource):
                         on rl_my.reviewId = r.id and rl_my.userId = %s
                     where distance < %s
                     group by r.id
-                    order by distance asc
+                    order by r.createdAt desc
                     limit {offset}, {limit}) re
                     left join review_comment rc
                     on rc.reviewId = re.id
