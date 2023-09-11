@@ -437,10 +437,10 @@ class ReviewResource(Resource):
             cursor.execute(query,record)
             
 
-            query = '''
+            query = f'''
                 select re.*, count(rc.reviewId) as 'commentCnt'
                 from (select r.*,ifnull(u.profileURL, '') profile, u.nickname , s.name storeName,s.lat as storeLat, s.lng storeLng, s.addr storeAddr,
-                    count(rl.reviewId) as 'likeCnt', if(rl_my.userId, 1, 0) isLike
+                    count(rl.reviewId) as 'likeCnt', if(rl_my.userId, 1, 0) isLike, if(r.userId = {userId}, 1, 0) isMine
                     from review r
                         join user u
                         on r.userId = u.id
@@ -464,6 +464,8 @@ class ReviewResource(Resource):
                     'result' : 'fail',
                     'error' : '게시물을 찾을 수 없습니다.'
                 }, 400       
+            
+            print(reviewId)
             
             query = '''
                 select photoURL as photo
