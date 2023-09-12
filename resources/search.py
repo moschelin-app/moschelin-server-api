@@ -130,7 +130,7 @@ class SearchResource(Resource):
             # 검색 가게
                 # 관련된 검색 중 평점이 가장 높은 1개를 보여줌
             query = f'''
-                select s.id storeId, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
+                select s.id storeId, ifnull(s.photoURL, '') as storePhoto, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
                 from store s
                     join review r
                     on s.id = r.storeId
@@ -293,7 +293,7 @@ class SearchDetailStoreResource(Resource):
             connection = get_connection()
             
             query = f'''
-                select s.id storeId, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
+                select s.id storeId, ifnull(s.photoURL, '') as storePhoto, s.name storeName, s.addr storeAddr, s.lat storeLat, s.lng storeLng, ifnull(avg(r.rating) ,0) as rating
                 from store s
                     left join review r
                     on s.id = r.storeId
