@@ -174,7 +174,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aws-moschelin-project-api/dev/1694481232248-2023-09-12T01:13:52.248Z/aws-moschelin-project-api.zip"
+                "S3Key": "serverless/aws-moschelin-project-api/dev/1694489271080-2023-09-12T03:27:51.080Z/aws-moschelin-project-api.zip"
               },
               "Handler": "wsgi_handler.handler",
               "Runtime": "python3.10",
@@ -192,14 +192,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionIxixI2wQwNBXLJtsDdYpyQGpCTiHQZo2a69K08bxm4": {
+          "ApiLambdaVersionHB9yThsdN4wQ1m5NbGqEgdq4zP3IGpRScpiwDgmII": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "Q35x2x+JXx6eheJ8U56gWa7f383FEMHjnH7wjnBeOm4="
+              "CodeSha256": "CDv9LPj4H7xxMIGOuli+HuV43t8mi5LcU+PufwIdKXM="
             }
           },
           "HttpApi": {
@@ -307,7 +307,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionIxixI2wQwNBXLJtsDdYpyQGpCTiHQZo2a69K08bxm4"
+              "Ref": "ApiLambdaVersionHB9yThsdN4wQ1m5NbGqEgdq4zP3IGpRScpiwDgmII"
             },
             "Export": {
               "Name": "sls-aws-moschelin-project-api-dev-ApiLambdaFunctionQualifiedArn"
@@ -458,7 +458,7 @@
         "timeout": 6,
         "runtime": "python3.10",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionIxixI2wQwNBXLJtsDdYpyQGpCTiHQZo2a69K08bxm4"
+        "versionLogicalId": "ApiLambdaVersionHB9yThsdN4wQ1m5NbGqEgdq4zP3IGpRScpiwDgmII"
       }
     },
     "configValidationMode": "warn",
@@ -484,7 +484,7 @@
     "artifact": "C:\\Users\\Home\\Documents\\Github\\aws-moschelin-project-api\\.serverless\\aws-moschelin-project-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/aws-moschelin-project-api/dev/1694481232248-2023-09-12T01:13:52.248Z",
+    "artifactDirectoryName": "serverless/aws-moschelin-project-api/dev/1694489271080-2023-09-12T03:27:51.080Z",
     "artifact": "aws-moschelin-project-api.zip"
   }
 }
