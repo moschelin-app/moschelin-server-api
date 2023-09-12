@@ -10,3 +10,4 @@ psycopg2-binary
 flask-jwt-extended
 googlemaps
 requests==2.25.0
+python-dotenv
