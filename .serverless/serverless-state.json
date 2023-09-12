@@ -174,7 +174,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aws-moschelin-project-api/dev/1694489271080-2023-09-12T03:27:51.080Z/aws-moschelin-project-api.zip"
+                "S3Key": "serverless/aws-moschelin-project-api/dev/1694490140038-2023-09-12T03:42:20.038Z/aws-moschelin-project-api.zip"
               },
               "Handler": "wsgi_handler.handler",
               "Runtime": "python3.10",
@@ -484,7 +484,7 @@
     "artifact": "C:\\Users\\Home\\Documents\\Github\\aws-moschelin-project-api\\.serverless\\aws-moschelin-project-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/aws-moschelin-project-api/dev/1694489271080-2023-09-12T03:27:51.080Z",
+    "artifactDirectoryName": "serverless/aws-moschelin-project-api/dev/1694490140038-2023-09-12T03:42:20.038Z",
     "artifact": "aws-moschelin-project-api.zip"
   }
 }
