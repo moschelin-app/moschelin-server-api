@@ -41,8 +41,6 @@ jobs:
         DB_DATABASE: ${{secrets.DB_DATABASE}}
         SALT: ${{secrets.SALT}}
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         S3_BUCKET: ${{secrets.S3_BUCKET}}
         GOOGLE_KEY: ${{secrets.GOOGLE_KEY}}
         NAVER_CLIENT_KEY: ${{secrets.NAVER_CLIENT_KEY}}
@@ -51,3 +49,5 @@ jobs:
     - run: serverless plugin install -n serverless-wsgi
     - name: severless deploy
       run: sls deploy --verbose --force
+        # AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        # AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
