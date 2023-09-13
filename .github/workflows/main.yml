@@ -41,11 +41,8 @@ jobs:
         DB_DATABASE: ${{secrets.DB_DATABASE}}
         SALT: ${{secrets.SALT}}
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
-<<<<<<< Updated upstream
-=======
         AWS_ACCESS_KEY_ID_FILE: ${{secrets.AWS_ACCESS_KEY_ID_FILE}}
         AWS_SECRET_ACCESS_KEY_FILE: ${{secrets.AWS_SECRET_ACCESS_KEY_FILE}}
->>>>>>> Stashed changes
         S3_BUCKET: ${{secrets.S3_BUCKET}}
         GOOGLE_KEY: ${{secrets.GOOGLE_KEY}}
         NAVER_CLIENT_KEY: ${{secrets.NAVER_CLIENT_KEY}}
