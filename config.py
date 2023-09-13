@@ -17,8 +17,8 @@ class Config:
     JWT_ACCESS_TOKKEN_EXPIRES = False
     PROPAGATE_EXCEPTIONS = True
     
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID_FILE')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY_FILE')
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=720)
     
     S3_BUCKET = os.environ.get('S3_BUCKET')

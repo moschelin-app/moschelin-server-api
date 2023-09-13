@@ -28,8 +28,8 @@ jobs:
         echo "DB_DATABASE=$DB_DATABASE" >> .env
         echo "SALT=$SALT" >> .env
         echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
-        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
-        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+        echo "AWS_ACCESS_KEY_ID_FILE=$AWS_ACCESS_KEY_ID_FILE" >> .env
+        echo "AWS_SECRET_ACCESS_KEY_FILE=$AWS_SECRET_ACCESS_KEY_FILE" >> .env
         echo "S3_BUCKET=$S3_BUCKET" >> .env
         echo "GOOGLE_KEY=$GOOGLE_KEY" >> .env
         echo "NAVER_CLIENT_KEY=$NAVER_CLIENT_KEY" >> .env
@@ -41,11 +41,21 @@ jobs:
         DB_DATABASE: ${{secrets.DB_DATABASE}}
         SALT: ${{secrets.SALT}}
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+<<<<<<< Updated upstream
+=======
+        AWS_ACCESS_KEY_ID_FILE: ${{secrets.AWS_ACCESS_KEY_ID_FILE}}
+        AWS_SECRET_ACCESS_KEY_FILE: ${{secrets.AWS_SECRET_ACCESS_KEY_FILE}}
+>>>>>>> Stashed changes
         S3_BUCKET: ${{secrets.S3_BUCKET}}
         GOOGLE_KEY: ${{secrets.GOOGLE_KEY}}
         NAVER_CLIENT_KEY: ${{secrets.NAVER_CLIENT_KEY}}
         NAVER_SECRET_KEY: ${{secrets.NAVER_SECRET_KEY}}
 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - run: serverless plugin install -n serverless-wsgi
     - name: severless deploy
       run: sls deploy --verbose --force

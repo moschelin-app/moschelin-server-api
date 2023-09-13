@@ -8,4 +8,5 @@ markupsafe==2.0.1
 mysql-connector-python
 passlib
 psycopg2-binary
+python-dotenv
 requests==2.25.0
