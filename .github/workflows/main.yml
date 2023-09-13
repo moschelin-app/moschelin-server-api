@@ -28,8 +28,6 @@ jobs:
         echo "DB_DATABASE=$DB_DATABASE" >> .env
         echo "SALT=$SALT" >> .env
         echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
-        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
-        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
         echo "S3_BUCKET=$S3_BUCKET" >> .env
         echo "GOOGLE_KEY=$GOOGLE_KEY" >> .env
         echo "NAVER_CLIENT_KEY=$NAVER_CLIENT_KEY" >> .env
