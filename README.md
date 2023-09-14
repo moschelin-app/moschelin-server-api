@@ -36,14 +36,12 @@
 </div>
 
 
-## 📌 모슐랭 프로젝트 화면기획서
-https://www.figma.com/file/u4Yfeh6V5YyP4WLM07VFuR/%EC%8B%9D%EB%8B%B9-%EC%9D%8C%EC%8B%9D-%EB%A6%AC%EB%B7%B0-%ED%8F%89%EA%B0%80-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?type=design&node-id=1-2093&mode=design&t=BvwmGoQ2bvipNG0X-0
+# 서버 구성
+## 📌 데이터베이스 설계 (ERD)
+[![모슐랭 데이터베이스 설계(ERD)](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/d7eab8b2-6241-41ba-b47a-2efa0b0b1b1c)](https://www.erdcloud.com/d/iB8HuSHS36XdmfD9x)
 
 ## 📌 모슐랭 프로젝트 API 명세서
-https://documenter.getpostman.com/view/28003230/2s9Y5SXmC8#ec06fe6c-35bc-4b91-b7d6-f4cb61efc7af
+[![image](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/e4013b59-a048-409d-8db4-7855001179ba)](https://documenter.getpostman.com/view/28003230/2s9Y5SXmC8)
 
-## 📌 모슐랭 프로젝트 테이블 명세서
-https://www.erdcloud.com/d/iB8HuSHS36XdmfD9x
-
-## 📌 모슐랭 프로젝트 기술서
-https://docs.google.com/presentation/d/1nBHp1jD-e28oHYuJdciJuy_egLrKEvJw/edit#slide=id.p1
+## 📌 서버 아키텍쳐
+![서버 아키텍처](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/98004fea-ec0a-484c-95b5-d6464209cbb1)
