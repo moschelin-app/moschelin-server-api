@@ -1,7 +1,7 @@
 ![main](https://github.com/moschelin-app/client_mochelin_android/assets/124220561/ba1cdca6-b93e-4d61-bdaa-f56bea3d32c0)
 
 
-# 🍳 당신이 찾는 맛집! 주변의 새로운 만남이 있는 곳, 모슐랭🍴
+# 당신이 찾는 맛집! 주변의 새로운 만남이 있는 곳, 모슐랭🍴
 
 ## 📌 Project Explanation
 
