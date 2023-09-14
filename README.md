@@ -8,11 +8,6 @@
 -  푸드테크란 4차산업혁명에 맞추어 식품과 기술이 접목된 산업으로, 유저들에게는 이제 이미 익숙한 배달의민족 / 마켓컬리 등등이 있습니다. 한국시장은 아래 활용 분야를 모두 아우른 명확한 시장 규모는 현재 약 200조로 추정할 만큼 시장규모가 큽니다. 이 중에서 저희가 앱으로 만들기로 한 부분은 주변 가게 리뷰 및 모임을 위한 서비스로 맛집에 모임으로 같이 갈 수 있게 하고 리뷰를 간추려서 쉽게 볼 수 있도록 차별성을 두게 만들었습니다.
 
 ---
-- 카카오 로그인 서비스 : 카카오 계정을 이용하여, 간편하게 회원 가입 및 로그인을 할 수 있습니다.
-- 리뷰 서비스 : 이미지와 글, 별점, 태깅을 포함한 리뷰를 업로드 하고 유저 간 다른 리뷰에 좋아요를 표할 수도 있으며 댓글을 달 수 있습니다. 
-- 특정 가게 리뷰 요약 서비스 : 유저들이 작성한 특정 가게의 전체 리뷰를 요약해서 보여줍니다.
-- 모임 서비스 : 유저가 특정 가게를 지정하고 일정, 모임 정원, 계산 방법을 정하여 모임을 만들 수 있습니다.
-- 위치 기반 서비스 : 유저의 현 위치를 기반으로, 가까운 가게의 리뷰와 모임을 확인할 수 있고 간략히 지도에 표시해서 간편하게 볼 수 있습니다.
 
 ## 📚 
 <div align = "center">
@@ -29,8 +24,8 @@
   <img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat-square&logo=Amazon S3&logoColor=white"/>
   <img src="https://img.shields.io/badge/AWS Lambda-FF9900?style=flat-square&logo=AWS Lambda&logoColor=white"/>
 
-  <img src="https://img.shields.io/badge/Naver-03C75A?style=flat-square&logo=Naver Clova&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Google Maps-4285F4?style=flat-square&logo=Google Place&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Naver Clova-03C75A?style=flat-square&logo=Naver&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Google Place-4285F4?style=flat-square&logo=Google&logoColor=white"/> 
 
   <img src="https://img.shields.io/badge/Amazon API Gateway-FF4F8B?style=flat-square&logo=Amazon API Gateway&logoColor=white"/>   <img src="https://img.shields.io/badge/Amazon CloudWatch-FF4F8B?style=flat-square&logo=Amazon CloudWatch&logoColor=white"/>
 </div>
