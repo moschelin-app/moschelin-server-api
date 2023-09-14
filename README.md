@@ -1,6 +1,6 @@
 ![main](https://github.com/moschelin-app/client_mochelin_android/assets/124220561/ba1cdca6-b93e-4d61-bdaa-f56bea3d32c0)
 
----
+
 # 🍳 당신이 찾는 맛집! 주변의 새로운 만남이 있는 곳, 모슐랭🍴
 
 ## 📌 Project Explanation
@@ -9,23 +9,24 @@
 
 ---
 
-## 📚 
 <div align = "center">
+  <h1>📚</h1>
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/> 
   <img src="https://img.shields.io/badge/Flask-000000?style=flat-square&logo=Flask&logoColor=white"/>
   <img src="https://img.shields.io/badge/Serverless-FD5750?style=flat-square&logo=Serverless&logoColor=white"/>
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/postman-FF6C37?style=flat-square&logo=postman&logoColor=white"/>
 
   <br>
-   <img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=flat-square&logo=Amazon AWS&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Naver Clova-03C75A?style=flat-square&logo=Naver&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Google Place-4285F4?style=flat-square&logo=Google&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/postman-FF6C37?style=flat-square&logo=postman&logoColor=white"/>
   <br>
+  
+  <img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=flat-square&logo=Amazon AWS&logoColor=white"/>
   <img src="https://img.shields.io/badge/Amazon RDS-527FFF?style=flat-square&logo=Amazon RDS&logoColor=white"/>
   <img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat-square&logo=Amazon S3&logoColor=white"/>
   <img src="https://img.shields.io/badge/AWS Lambda-FF9900?style=flat-square&logo=AWS Lambda&logoColor=white"/>
 
-  <img src="https://img.shields.io/badge/Naver Clova-03C75A?style=flat-square&logo=Naver&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Google Place-4285F4?style=flat-square&logo=Google&logoColor=white"/> 
 
   <img src="https://img.shields.io/badge/Amazon API Gateway-FF4F8B?style=flat-square&logo=Amazon API Gateway&logoColor=white"/>   <img src="https://img.shields.io/badge/Amazon CloudWatch-FF4F8B?style=flat-square&logo=Amazon CloudWatch&logoColor=white"/>
 </div>
