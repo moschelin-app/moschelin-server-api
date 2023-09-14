@@ -33,11 +33,11 @@
 
 
 # 서버 구성
-## 📌 데이터베이스 설계 (ERD)
-[![모슐랭 데이터베이스 설계(ERD)](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/d7eab8b2-6241-41ba-b47a-2efa0b0b1b1c)](https://www.erdcloud.com/d/iB8HuSHS36XdmfD9x)
+## 📌 [데이터베이스 설계 (ERD)](https://www.erdcloud.com/d/iB8HuSHS36XdmfD9x)
+![모슐랭 데이터베이스 설계(ERD)](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/d7eab8b2-6241-41ba-b47a-2efa0b0b1b1c)
 
-## 📌 모슐랭 프로젝트 API 명세서
-[![image](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/e4013b59-a048-409d-8db4-7855001179ba)](https://documenter.getpostman.com/view/28003230/2s9Y5SXmC8)
+## 📌 [모슐랭 프로젝트 API 명세서](https://documenter.getpostman.com/view/28003230/2s9Y5SXmC8)
+![image](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/e4013b59-a048-409d-8db4-7855001179ba)
 
 ## 📌 서버 아키텍쳐
 ![서버 아키텍처](https://github.com/moschelin-app/moschelin-server-api/assets/108748094/98004fea-ec0a-484c-95b5-d6464209cbb1)
